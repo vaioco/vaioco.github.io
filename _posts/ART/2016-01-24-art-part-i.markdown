@@ -118,23 +118,13 @@ A Java class loaded in memory has a structure looks like the following one:
 (gdb) p/x *(art::mirror::Class*) 0x70377fc0
 $48 = {
 	[...]
-  members of art::mirror::Class: 
-  static kImtSize = 0x40, 
-  class_loader_ = {
-    <art::mirror::ObjectReference<false, art::mirror::ClassLoader>> = {
-      reference_ = 0x0
-    }, <No data fields>}, 
+  members of art::mirror::Class:  
   [...]
   direct_methods_ = {
     <art::mirror::ObjectReference<false, art::mirror::ObjectArray<art::mirror::ArtMethod> >> = {
       reference_ = 0x700ec788
     }, <No data fields>}, 
   [...]
-  name_ = {
-    <art::mirror::ObjectReference<false, art::mirror::String>> = {
-      reference_ = 0x6faf33c8
-    }, <No data fields>}, 
- 	[...]
   virtual_methods_ = {
     <art::mirror::ObjectReference<false, art::mirror::ObjectArray<art::mirror::ArtMethod> >> = {
       reference_ = 0x700ed158
@@ -144,9 +134,7 @@ $48 = {
       reference_ = 0x0
     }, <No data fields>},   
   access_flags_ = 0x80001, 
-  class_size_ = 0x604, 
-  num_reference_instance_fields_ = 0x2, 
-  num_reference_static_fields_ = 0x1d, 
+  class_size_ = 0x604,  
   object_size_ = 0x10, 
   status_ = 0xa, 
   [...]
@@ -176,26 +164,6 @@ $23 = {
 {% endhighlight %}
 
 
-### Hooking virtual methods for profit ###
-
-What do you need for hooking Java virtual methods?
-
-1. new Java method memory address 
-2. original method's (target) reference and his position inside the virtual-table array
-
-We can leaverage the JNI mechanism to get the target method address
-
-{% highlight C linenos %}
-754  bool ShouldHaveEmbeddedImtAndVTable() SHARED_LOCKS_REQUIRED(Locks::mutator_lock_) {
-755    return IsInstantiable();
-756  }
-
-454  bool IsInstantiable() SHARED_LOCKS_REQUIRED(Locks::mutator_lock_) {
-455    return (!IsPrimitive() && !IsInterface() && !IsAbstract()) ||
-456        (IsAbstract() && IsArrayClass());
-457  }
-458
-{% endhighlight %}
 
 ### References ###
 [asd](http://census-labs.com/media/Fuzzing_Objects_d_ART_hitbsecconf2015ams_WP.pdf)

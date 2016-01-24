@@ -28,28 +28,14 @@ kramdown:
 # Site owner
 owner:
   name: Valerio Costamagna
-  avatar: bio-photo.jpg
-  bio: "vaioco"
+  avatar: bio-photo-2.jpg
+  bio: "questa e' la mia bio"
   email: "valerio.costamagna.AT.di.unito.it"
-  disqus-shortname:
-  twitter: #vaio_co
-  bing-verify:
-  github: #vaioco
-  stackoverflow: #123456/username   from a "http://stackoverflow.com/users/123456/username" link
-  linkedin: #username
-  xing: #username
-  instagram: #username
-  lastfm: #username
-  tumblr: #username
-  pinterest: #username
-  foursquare: #username
-  steam: #username
-  dribbble: #username
-  youtube: #username
-  soundcloud: #username
-  weibo: #username
-  flickr: #username
-  codepen: #username
+  twitter: "vaio_co"
+  github: "vaioco"
+
+author:
+  twitter: vaioco
 
 include: [".htaccess"]
 exclude: ["lib", "config.rb", "Capfile", "config", "log", "Rakefile", "Rakefile.rb", "tmp", "less", "*.sublime-project", "*.sublime-workspace", "test", "spec", "Gruntfile.js", "package.json", "node_modules", "Gemfile", "Gemfile.lock", "LICENSE", "README.md"]
