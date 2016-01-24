@@ -17,6 +17,7 @@ gems:
   - jekyll-sitemap
 
 kramdown:
+  input: GFM
   auto_ids: true
   footnote_nr: 1
   entity_output: as_char
@@ -29,16 +30,9 @@ owner:
   name: Valerio Costamagna
   avatar: bio-photo.jpg
   bio: "vaioco"
-  email:
+  email: "valerio.costamagna.AT.di.unito.it"
   disqus-shortname:
   twitter: #vaio_co
-  facebook: #username
-  google:
-    plus: #username
-    analytics:
-    verify:
-    ad-client:
-    ad-slot:
   bing-verify:
   github: #vaioco
   stackoverflow: #123456/username   from a "http://stackoverflow.com/users/123456/username" link
