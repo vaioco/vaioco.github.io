@@ -13,17 +13,17 @@ date: 2016-01-25T00:38:11+01:00
 ### Hooking virtual methods for profit ###
 
 What do you need for hooking Java virtual methods? Suppose you want to hook the method **A** within class **Z** and divert the control flow
-to the new method **A'**, the "patch" method. You have to:
+to the new method **B**, the "patch" method. You have to:
 
-1. load **A'** method into application's memory 
+1. load **B** method into application's memory 
 2. retrive **A**'s reference from memory and its position inside the **Z**'s vtable array
-3. change the pointer to **A** inside **Z**'s vtable and make it pointing to **A'**
+3. change the pointer to **A** inside **Z**'s vtable and make it pointing to **B**
 
 Using the _GetMethodID_ function of java native Interface (JNI) we can get the **A**'s memory reference. The _GetMethodID_ function returns an _jobject_ type, it is just an alias for the **ArtMethod** data structure.
 
-Using relative offset we can access to elements inside the returned ArtMethod for retriving the information needed for locating **A**'s memory reference within the **Z**'s **vtable** array. Relative offsets can be obtained from a debbugging session with symbols. ART's internals are very unliked the subject of OEM modifications.
+Using relative offset we can access to elements inside the returned ArtMethod for retriving the information needed for locating **A**'s memory reference within the **Z**'s **vtable** array. ART's internals are very unliked the subject of OEM modifications.
 
-To achieve point 1 we use the DexClassLoader API, the method **A'** is defined by the user and loaded from a DEX file.
+To achieve point 1 we use the DexClassLoader API, the method **B** is defined by the user and loaded from a DEX file.
 
 Once we have got the information scanning the memory we can get point 3 using just simple memory operation from native code.
 
