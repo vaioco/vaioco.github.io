@@ -1,0 +1,207 @@
+---
+layout: post
+title: ART - Part I
+modified:
+categories: ART
+excerpt:
+tags: []
+image:
+  feature:
+date: 2016-01-24T02:44:52+01:00
+---
+
+## ART runtime ##
+Google has replaced ([AOSP commit](https://android-review.googlesource.com/#/c/98553/)) the Dalvik (DVM) runtime  with the ART runtime, Dalvik is no longer available from Android 5.0.
+ART introduces Ahead-of-time (AOT) compilation, at installation time ART compiles applications using the on-device **dex2oat**. 
+
+ART uses two new files formats:
+
++ .ART: only one file, **boot.art** in "/system/framework/\<arch>". Image file with a heap of preinitialized classes and objects
++ .OAT: Master file **boot.oat** in "/system/framework/\<arch>". Compiled application will be saved as OAT file.
+
+dex2oat utility takes a DEX file as input and produces an OAT file as output, the compiled application is device-dependent. The resulting OAT file will be generated inside the "/data/dalvik-cache/\<arch>" folder, where \<arch> is the target architecture of the compilation. (i.e. architecture of the device). 
+
+OAT file format is developed by Google, it is embedded into an ELF file format. It contains DEX code, compiled native code and metadata. OAT files are loaded into application like a shared object.
+
+Android framework JARs are compiled at the first device boot, the resulting files are _boot.art_, the **image file**, and _boot.oat_. The image file is placed in memory right before the **boot.oat**, which links to it.
+
+![My helpful screenshot]({{ site.url }}/assets/imgs/file_formats.png)
+
+Runtime flow is pictured into the following image:
+
+![asd]({{ site.url }}/assets/imgs/runtime_flow.png)
+
+## ART Data Structures
+The ART Data Structures (ADS) useful for our interests are the following:
+
+1. Class ([androidxref](http://androidxref.com/6.0.1_r10/xref/art/runtime/mirror/class.h))
+2. ArtMethod ([androidxref](http://androidxref.com/6.0.1_r10/xref/art/runtime/art_method.h))
+
+The _Class_ data structure define the layout of a Java class, the following two members are used for looking up virtual methods:
+
+{% highlight C linenos %}
+1220  // Virtual method table (vtable), for use by "invoke-virtual".  The vtable from the superclass is
+1221  // copied in, and virtual methods from our class either replace those from the super or are
+1222  // appended. For abstract classes, methods may be created in the vtable that aren't in
+1223  // virtual_ methods_ for miranda methods.
+1224  HeapReference<PointerArray> vtable_;
+
+1246  // Virtual methods defined in this class; invoked through vtable. Pointer to an ArtMethod array.
+1247  uint64_t virtual_methods_;
+{% endhighlight %}
+
+The _vtable\__ is a reference to an array of pointers. Each element is a pointer to methods defined inside that class and methods from the superclass. Instead, virtual_methods\__ is a reference to an array of pointers to methods defined only inside that class, each element is an _ArtMethod_ type.
+
+The type used to represent a Java method is called _ArtMethod_, its iteresting elements are the following: 
+
+
+{% highlight C linenos %}
+544  GcRoot<mirror::Class> declaring_class_;
+552  // Access flags; low 16 bits are defined by spec.
+553  uint32_t access_flags_;
+565  // Entry within a dispatch table for this method. For static/direct methods the index is into
+566  // the declaringClass.directMethods, for virtual methods the vtable and for interface methods the
+567  // ifTable.
+568  uint32_t method_index_;
+{% endhighlight %}
+
+_declaring\_class\__,line 544, is a reference to the class which define the method. The _access\_flags\__ is used for set the class visibility (public, static, native, interface, etc..) and _method\_index\_ value contains the method's index value inside the vtable.
+
+Before starting the real fun, let me introduce my envinronment.
+
+### Be comfortable with the environment ###
+
+I suggest to you to use Ubuntu for building from AOSP ( or debian is likely as well). I used a Nexus6 with AOSP, y running version at the writing time is XXX
+
+The requirements are the following:
+
+* Android SDK
+* Android NDK
+* device/emulator with AOSP build (refer to [building AOSP](https://source.android.com/source/initializing.html))
+
+I will use GDB as debugger, radare is a very good alternative, and the symbols taken from the AOSP build.
+Be comfortable means uses scripts for simplify your exploration, first create a directory with links to the symbols you need. For our purposes we need the following symbols:
+
+{% highlight bash linenos %}
+lrwxrwxrwx 1 root root   72 gen 23 15:46 app_process32 -> symbols/system/bin/app_process32
+lrwxrwxrwx 1 root root   76 gen 23 15:45 libandroidfw.so -> symbols/system/lib/libandroidfw.so
+lrwxrwxrwx 1 root root   88 gen 23 15:45 libandroid_runtime.so -> symbols/system/lib/libandroid_runtime.so
+lrwxrwxrwx 1 root root   64 gen 23 15:45 libart.so -> symbols/system/lib/libart.so
+lrwxrwxrwx 1 root root   60 gen 23 15:44 libc.so -> symbols/system/lib/libc.so
+lrwxrwxrwx 1 root root   70 gen 23 15:45 libcutils.so -> symbols/system/lib/libcutils.so
+lrwxrwxrwx 1 root root   64 gen 23 15:45 liblog.so -> symbols/system/lib/liblog.so
+lrwxrwxrwx 1 root root   70 gen 23 15:44 libstdc++.so -> symbols/system/lib/libstdc++.so
+lrwxrwxrwx 1 root root   68 gen 23 15:45 libutils.so -> symbols/system/lib/libutils.so
+lrwxrwxrwx 1 root root   58 gen 23 15:45 linker -> symbols/system/bin/linker
+{% endhighlight %}
+
+The following GDB script will set the debugging session options
+
+{% highlight bash linenos %}
+target remote :1337
+set solib-search-path .
+{% endhighlight %}
+
+The port 1337 will be used for connecting to the debugger instance running on the device, we have to forward the port with the adb utility running the following command:
+
+{% highlight bash linenos %}
+adb forward tcp:1337 tcp:1337
+{% endhighlight %}
+
+
+
+### Debugging for fun and profit ###
+
+A Java class loaded in memory has a structure looks like the following one:
+
+{% highlight C linenos %}
+(gdb) p/x *(art::mirror::Class*) 0x70377fc0
+$48 = {
+	[...]
+  members of art::mirror::Class: 
+  static kImtSize = 0x40, 
+  class_loader_ = {
+    <art::mirror::ObjectReference<false, art::mirror::ClassLoader>> = {
+      reference_ = 0x0
+    }, <No data fields>}, 
+  [...]
+  direct_methods_ = {
+    <art::mirror::ObjectReference<false, art::mirror::ObjectArray<art::mirror::ArtMethod> >> = {
+      reference_ = 0x700ec788
+    }, <No data fields>}, 
+  [...]
+  name_ = {
+    <art::mirror::ObjectReference<false, art::mirror::String>> = {
+      reference_ = 0x6faf33c8
+    }, <No data fields>}, 
+ 	[...]
+  virtual_methods_ = {
+    <art::mirror::ObjectReference<false, art::mirror::ObjectArray<art::mirror::ArtMethod> >> = {
+      reference_ = 0x700ed158
+    }, <No data fields>}, 
+  vtable_ = {
+    <art::mirror::ObjectReference<false, art::mirror::ObjectArray<art::mirror::ArtMethod> >> = {
+      reference_ = 0x0
+    }, <No data fields>},   
+  access_flags_ = 0x80001, 
+  class_size_ = 0x604, 
+  num_reference_instance_fields_ = 0x2, 
+  num_reference_static_fields_ = 0x1d, 
+  object_size_ = 0x10, 
+  status_ = 0xa, 
+  [...]
+}
+{% endhighlight %}
+
+_virtual\_methods\__ is a reference to an "art::mirror::ObjectArray<art::mirror::ArtMethod> >>", an array of ArtMethods objects. 
+
+{% highlight bash linenos %}
+(gdb) p/x ((art::mirror::Class *)0x7110bf10)->virtual_methods_
+$20 = {
+  <art::mirror::ObjectReference<false, art::mirror::ObjectArray<art::mirror::ArtMethod> >> = {
+    reference_ = 0x70e7b3c8
+  }, <No data fields>}
+{% endhighlight %}
+The following code show its structure from memory:
+
+{% highlight bash linenos %}
+(gdb) p/x *(art::mirror::ObjectArray<art::mirror::ArtMethod>*) 0x70e7b3c8
+$23 = {
+  <art::mirror::Array> = {
+	[...]
+    members of art::mirror::Array: 
+    length_ = 0x280, 
+    first_element_ = 0x70e7b3d4
+  }, <No data fields>}
+{% endhighlight %}
+
+
+### Hooking virtual methods for profit ###
+
+What do you need for hooking Java virtual methods?
+
+1. new Java method memory address 
+2. original method's (target) reference and his position inside the virtual-table array
+
+We can leaverage the JNI mechanism to get the target method address
+
+{% highlight C linenos %}
+754  bool ShouldHaveEmbeddedImtAndVTable() SHARED_LOCKS_REQUIRED(Locks::mutator_lock_) {
+755    return IsInstantiable();
+756  }
+
+454  bool IsInstantiable() SHARED_LOCKS_REQUIRED(Locks::mutator_lock_) {
+455    return (!IsPrimitive() && !IsInterface() && !IsAbstract()) ||
+456        (IsAbstract() && IsArrayClass());
+457  }
+458
+{% endhighlight %}
+
+### References ###
+[asd](http://census-labs.com/media/Fuzzing_Objects_d_ART_hitbsecconf2015ams_WP.pdf)
+https://www.blackhat.com/docs/asia-15/materials/asia-15-Sabanal-Hiding-Behind-ART-wp.pdf
+http://newandroidbook.com/files/Andevcon-ART.pdf
+https://conference.hitb.org/hitbsecconf2014ams/materials/D1T2-State-of-the-Art-Exploring-the-New-Android-KitKat-Runtime.pdf
+https://www.quora.com/What-are-the-technical-details-of-the-Android-ART-runtime-introduced-in-Android-4-4
+Android Internals: A Confectioner's Cookbook (Jonathan Levin)
+http://www.kandroid.org/board/data/board/conference/file_in_body/1/14th_kandroid_minmax_v11.pdf
