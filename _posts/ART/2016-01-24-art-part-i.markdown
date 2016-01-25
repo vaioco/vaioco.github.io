@@ -64,7 +64,7 @@ _ArtMethod_ is the C++ class which define the Java method structure, its interes
 568  uint32_t method_index_;
 {% endhighlight %}
 
-_declaring\_class\__,line 544, is a reference to the class which define the method. The _access\_flags\__ is used for set the class visibility (public, static, native, interface, etc..) and _method\_index\__ contains the method's index value inside the vtable.
+_declaring\_class\__, line 544, is a reference to the class which define the method. The _access\_flags\__ is used for set the class visibility (public, static, native, interface, etc..) and _method\_index\__ contains the method's index value inside the vtable.
 
 Before starting the real fun, let me introduce my work envinronment.
 
@@ -140,7 +140,7 @@ $48 = {
 }
 {% endhighlight %}
 
-_virtual\_methods\__ is a reference to an "art::mirror::ObjectArray<art::mirror::ArtMethod> >>", an array of ArtMethods objects. 
+_virtual\_methods\__ is a reference to an "art::mirror::ObjectArray<art::mirror::ArtMethod> >>", an array of _ArtMethod_ objects. 
 
 {% highlight bash linenos %}
 (gdb) p/x ((art::mirror::Class *)0x7110bf10)->virtual_methods_
