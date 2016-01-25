@@ -164,10 +164,10 @@ $23 = {
 
 
 ### References ###
-[asd](http://census-labs.com/media/Fuzzing_Objects_d_ART_hitbsecconf2015ams_WP.pdf)
-https://www.blackhat.com/docs/asia-15/materials/asia-15-Sabanal-Hiding-Behind-ART-wp.pdf
-http://newandroidbook.com/files/Andevcon-ART.pdf
-https://conference.hitb.org/hitbsecconf2014ams/materials/D1T2-State-of-the-Art-Exploring-the-New-Android-KitKat-Runtime.pdf
-https://www.quora.com/What-are-the-technical-details-of-the-Android-ART-runtime-introduced-in-Android-4-4
-Android Internals: A Confectioner's Cookbook (Jonathan Levin)
-http://www.kandroid.org/board/data/board/conference/file_in_body/1/14th_kandroid_minmax_v11.pdf
+
+* [Fuzzing_Objects_d_ART_hitbsecconf2015ams_WP.pdf](http://census-labs.com/media/Fuzzing_Objects_d_ART_hitbsecconf2015ams_WP.pdf)
+* [asia-15-Sabanal-Hiding-Behind-ART-wp.pdf](https://www.blackhat.com/docs/asia-15/materials/asia-15-Sabanal-Hiding-Behind-ART-wp.pdf)
+* [Andevcon-ART](http://newandroidbook.com/files/Andevcon-ART.pdf)
+* [D1T2-State-of-the-Art-Exploring-the-New-Android-KitKat-Runtime.pdf](https://conference.hitb.org/hitbsecconf2014ams/materials/D1T2-State-of-the-Art-Exploring-the-New-Android-KitKat-Runtime.pdf)
+* Android Internals: A Confectioner's Cookbook (Jonathan Levin)
+* [kandroid](ttp://www.kandroid.org/board/data/board/conference/file_in_body/1/14th_kandroid_minmax_v11.pdf)

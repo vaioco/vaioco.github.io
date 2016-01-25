@@ -17,7 +17,7 @@ to the new method **B**, the "patch" method. You have to:
 
 1. load **B** method into application's memory 
 2. retrive **A**'s reference from memory and its position inside the **Z**'s vtable array
-3. change the pointer to **A** inside **Z**'s vtable and make it pointing to **B**
+3. change the pointer to **A** within **Z**'s vtable and make it pointing to **B**
 
 Using the _GetMethodID_ function of java native Interface (JNI) we can get the **A**'s memory reference. The _GetMethodID_ function returns an _jobject_ type, it is just an alias for the **ArtMethod** data structure.
 
@@ -25,29 +25,16 @@ Using relative offset, we can access to elements inside the object returned by _
 
 To achieve point 1 we use the DexClassLoader API, the method **B** is defined by the user and loaded from a DEX file.
 
-Once we have got the information scanning the memory we can get point 3 using just simple memory operation from native code.
+Once we have got the information scanning the memory, we can get point 3 using just simple memory operations by native code.
 
 Starting from the **A**'s memory reference we can parse the _ArtMethod_ structure from memory and get the following elements:
 
-1. declaring_class
+1. declaring_class_
 2. method_index_
 
 The first is a reference to **Z** (a **Class** object), that is the class which contains the method **A**. The latter is the **A**'s index value inside the vtable.
 
-Using the reference from point 1 we can parse the **Class** structure from memory and get the following information:
+Using the _declaring\_class\__ reference we can parse the **Class** structure from memory and get the following information:
 
 * vtable_
 * virtual_methods_
-
-
-{% highlight C linenos %}
-754  bool ShouldHaveEmbeddedImtAndVTable() SHARED_LOCKS_REQUIRED(Locks::mutator_lock_) {
-755    return IsInstantiable();
-756  }
-
-454  bool IsInstantiable() SHARED_LOCKS_REQUIRED(Locks::mutator_lock_) {
-455    return (!IsPrimitive() && !IsInterface() && !IsAbstract()) ||
-456        (IsAbstract() && IsArrayClass());
-457  }
-458
-{% endhighlight %}
