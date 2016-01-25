@@ -15,9 +15,9 @@ date: 2016-01-25T00:38:11+01:00
 What do you need for hooking Java virtual methods? Suppose you want to hook the method **A** within class **Z** and divert the control flow
 to the new method **B**, the "patch" method. You have to:
 
-1. load **B** method into application's memory 
-2. retrive **A**'s reference from memory and its position inside the **Z**'s vtable array
-3. change the pointer to **A** within **Z**'s vtable and make it pointing to **B**
+1. load **B** into application's memory 
+2. retrive **A**'s reference from memory and the position inside the **Z**'s vtable array
+3. change the pointer to **A** within **Z**'s vtable, pointing it to **B**
 
 Using the _GetMethodID_ function of java native Interface (JNI) we can get the **A**'s memory reference. The _GetMethodID_ function returns an _jobject_ type, it is just an alias for the **ArtMethod** data structure.
 
