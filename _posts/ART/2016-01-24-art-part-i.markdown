@@ -1,10 +1,10 @@
 ---
 layout: post
-title: ART - Part I
+title: ART Part I
 modified:
 categories: ART
 excerpt:
-tags: []
+tags: [android, ART]
 image:
   feature:
 date: 2016-01-24T02:44:52+01:00
@@ -32,7 +32,7 @@ Runtime flow is pictured into the following image:
 ![asd]({{ site.url }}/assets/imgs/runtime_flow.png)
 
 ## ART Data Structures
-The ART Data Structures (ADS) useful for our interests are the following:
+The ART Data Structures (ADS) useful for our interests are:
 
 1. Class ([androidxref](http://androidxref.com/6.0.1_r10/xref/art/runtime/mirror/class.h))
 2. ArtMethod ([androidxref](http://androidxref.com/6.0.1_r10/xref/art/runtime/art_method.h))
@@ -50,10 +50,9 @@ The _Class_ data structure define the layout of a Java class, the following two 
 1247  uint64_t virtual_methods_;
 {% endhighlight %}
 
-The _vtable\__ is a reference to an array of pointers. Each element is a pointer to methods defined inside that class and methods from the superclass. Instead, virtual_methods\__ is a reference to an array of pointers to methods defined only inside that class, each element is an _ArtMethod_ type.
+The _vtable\__ is a reference to an array of pointers. Each element is a pointer to a virtual method defined inside that class or to a virtual method from the superclass. Instead, virtual_methods\__ is a reference to an array of pointers to virtual methods defined inside that class, each element type is _ArtMethod_.
 
-The type used to represent a Java method is called _ArtMethod_, its iteresting elements are the following: 
-
+_ArtMethod_ is the C++ class which define the Java method structure, its interesting elements are: 
 
 {% highlight C linenos %}
 544  GcRoot<mirror::Class> declaring_class_;
@@ -65,9 +64,9 @@ The type used to represent a Java method is called _ArtMethod_, its iteresting e
 568  uint32_t method_index_;
 {% endhighlight %}
 
-_declaring\_class\__,line 544, is a reference to the class which define the method. The _access\_flags\__ is used for set the class visibility (public, static, native, interface, etc..) and _method\_index\_ value contains the method's index value inside the vtable.
+_declaring\_class\__,line 544, is a reference to the class which define the method. The _access\_flags\__ is used for set the class visibility (public, static, native, interface, etc..) and _method\_index\__ contains the method's index value inside the vtable.
 
-Before starting the real fun, let me introduce my envinronment.
+Before starting the real fun, let me introduce my work envinronment.
 
 ### Be comfortable with the environment ###
 
@@ -108,7 +107,7 @@ The port 1337 will be used for connecting to the debugger instance running on th
 adb forward tcp:1337 tcp:1337
 {% endhighlight %}
 
-
+I prefer to use the GDB from the AOSP toolchain, but the one from NDK should works as well.
 
 ### Debugging for fun and profit ###
 
@@ -162,7 +161,6 @@ $23 = {
     first_element_ = 0x70e7b3d4
   }, <No data fields>}
 {% endhighlight %}
-
 
 
 ### References ###

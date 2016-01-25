@@ -4,7 +4,7 @@ title: ART Part II - Hooking
 modified:
 categories: ART
 excerpt:
-tags: [android,ART]
+tags: [android, ART]
 image:
   feature:
 date: 2016-01-25T00:38:11+01:00
@@ -21,11 +21,23 @@ to the new method **B**, the "patch" method. You have to:
 
 Using the _GetMethodID_ function of java native Interface (JNI) we can get the **A**'s memory reference. The _GetMethodID_ function returns an _jobject_ type, it is just an alias for the **ArtMethod** data structure.
 
-Using relative offset we can access to elements inside the returned ArtMethod for retriving the information needed for locating **A**'s memory reference within the **Z**'s **vtable** array. ART's internals are very unliked the subject of OEM modifications.
+Using relative offset, we can access to elements inside the object returned by _GetMethodID_ for retriving the information needed for locating **A**'s memory reference within the **Z**'s **vtable** array. ART's internals are very unliked the subject of OEM modifications.
 
 To achieve point 1 we use the DexClassLoader API, the method **B** is defined by the user and loaded from a DEX file.
 
 Once we have got the information scanning the memory we can get point 3 using just simple memory operation from native code.
+
+Starting from the **A**'s memory reference we can parse the _ArtMethod_ structure from memory and get the following elements:
+
+1. declaring_class
+2. method_index_
+
+The first is a reference to **Z** (a **Class** object), that is the class which contains the method **A**. The latter is the **A**'s index value inside the vtable.
+
+Using the reference from point 1 we can parse the **Class** structure from memory and get the following information:
+
+* vtable_
+* virtual_methods_
 
 
 {% highlight C linenos %}
