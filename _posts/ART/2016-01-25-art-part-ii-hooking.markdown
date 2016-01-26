@@ -21,7 +21,7 @@ to the new method **B**, the "patch" method. You have to:
 
 Using the _GetMethodID_ function of java native Interface (JNI) we can get the **A**'s memory reference. The _GetMethodID_ function returns an _jobject_ type, it is just an alias for the **ArtMethod** data structure.
 
-Using relative offset, we can access to elements inside the object returned by _GetMethodID_ for retriving the information needed for locating **A**'s memory reference within the **Z**'s **vtable** array. ART's internals are very unliked the subject of OEM modifications.
+Using relative offset, we can access to elements inside the object returned by _GetMethodID_ for retriving the information needed for locating **A**'s memory reference within the **Z**'s **vtable** array. ART internals are very unlikely to be subject of OEM modifications.
 
 To achieve point 1 we use the DexClassLoader API, the method **B** is defined by the user and loaded from a DEX file.
 
@@ -117,7 +117,7 @@ _FindVirtualMethodForVirtual_, defined in "class-inl.h", search the target metho
 392 }
 {% endhighlight %}
 
-Analyzing the code at _GetVtableEntry_ function, still defined in "class-inl.h", we can see a call to _ShouldHaveEmbeddedImtAndVTable_ function and based on the returned result different code path would executed.
+Analyzing the _GetVtableEntry_ function code, still defined in "class-inl.h", we can see a call to function _ShouldHaveEmbeddedImtAndVTable_ and based on the returned result different code path would be executed.
 
 {% highlight C %}
 180inline ArtMethod* Class::GetVTableEntry(uint32_t i, size_t pointer_size) {
