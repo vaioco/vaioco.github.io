@@ -15,7 +15,7 @@ date: 2016-01-25T16:40:36+01:00
 What is ARTHook? It is an easy-to-use library for hooking virtual methods call under ART runtime. The thing is: you can override any virtual methods with your own one and thus hooking on every method call. 
 Imagine you want to intercept calls to a virtual method. You have to define your own Java method and by using ARTHook API you can override the target method. All future calls to the target method will be intercepted and they will go to your own method.
 
-What are the differences with state of the art?
+What are the differences from state of the art?
 ARTHook has various advantages respects to other projects like "APIMonitor", "DroidBox", Xposed" :
 
 1. you don't have to modify the target application's code
@@ -36,16 +36,19 @@ All the things you need are:
 
 ## How does ARTHook works? ##
 
-So far I introduced how the ART internals works and what is the lookup method used for calling virtual-methods. Let's go into the framework details.
+So far I introduced how the ART internals works and what is the code-path called for lookup virtual-methods. Let's go into the framework details.
 
-First challenge I had to solve was how to retrive the target method's reference from virtual memory. It was achieved using the Java Native Interfaces (JNI) facilities calling the function _GetMethodID_.
-Next question was, how do I retrive the _vtable\__ from within the Class data structure saved in virtual memory? Well, I got it using relative offsets starting from the Class' memory address. We have seen before the data structure layout, using a debugger (or reading the sources) we can retrive the offset for accessing the variable inside the data structure.
-Once we have the target method memory reference we can parse the _ArtMethod_ structure from memory and access to its useful elements. The last step is loading into the application's memory our own method implementation using a DEX file as container. Finally we just need to change the target method's pointer make pointing it to your own method.
+First challenge I had to solve was how to retrive the target method's reference from virtual memory. It was achieved using the Java Native Interfaces (JNI) facilities calling the function _GetMethodID_. Once we have the target method memory reference we can parse the _ArtMethod_ structure from memory and access to its useful elements, like **declaring_class_**. 
+
+Next question was, how do I retrive the _vtable\__ from within the Class data structure saved in virtual memory? Well, I got it using relative offsets starting from the Class' memory address. We have seen before the data structure layout, using a debugger (or reading the sources) we can retrive the offset for accessing the variable inside the **Class** data structure.
+
+
+The last step is load our own method implementation into the application's memory. We use the DexClassLoader using a DEX file as container. Finally we just need to change the target method's pointer make pointing it to your own method.
 
 ARTHook is composed by three elements:
 
 * core
 * Java API bridge
-* Java patch code
+* Java "patch" code
 
-The core code is written in C and the other parts are in Java. The API bridge permits the communication with the core from the user-defined Java patch code.
+The core is written in C and the other parts are in Java. The API bridge permits the communication with the core from the user-defined Java patch code. Users can defines they own "patch" methods using Java language, this facility permits to use Android API inside the "patch" method code.
