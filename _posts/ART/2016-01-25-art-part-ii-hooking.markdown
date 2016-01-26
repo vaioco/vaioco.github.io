@@ -13,10 +13,10 @@ date: 2016-01-25T00:38:11+01:00
 ### Hooking virtual methods for profit ###
 
 What do you need for hooking Java virtual methods? Suppose you want to hook the method **A** within class **Z** and divert the control flow
-to the new method **B**, the "patch" method. You have to:
+to the new method **B** within class **X**, the "patch" method. You have to:
 
-1. load **B** into application's memory 
-2. retrive **A**'s reference from memory and the position inside the **Z**'s vtable array
+1. load **X** into application's memory 
+2. retrive **A**'s reference from memory and its position inside the **Z**'s vtable array
 3. change the pointer to **A** within **Z**'s vtable, pointing it to **B**
 
 Using the _GetMethodID_ function of java native Interface (JNI) we can get the **A**'s memory reference. The _GetMethodID_ function returns an _jobject_ type, it is just an alias for the **ArtMethod** data structure.
@@ -39,7 +39,7 @@ Using the _declaring\_class\__ reference we can parse the **Class** structure fr
 * vtable_
 * virtual_methods_
 
-## How does the runtime lookup virtual methods? ##
+## How does the runtime is looking up virtual methods? ##
 
 First let's try to follow the flow of a java method called by JNI. As example we take in account the _CallObjectMethod_ function, defined in [jniinternals.c](http://androidxref.com/6.0.1_r10/xref/art/runtime/jni_internal.cc#680). This function is used for calling Java code from native code.
 
@@ -81,7 +81,7 @@ The called function _InvokeVirtualOrInterfaceWithVarArgs_ (line 686) is defined 
 At line 540 is retrived the _ArtMethod_ identified by the _jmethodID_ passed as third argument, the _FindVirtualMethod_ function is defined in reflection.cc
 The real method invocation is the call to _InvokeWithArgArray_ at line 552.
 
-The _FindVirtualMethod_ function is used for lookuping a virtual method inside its _receiver_ object, following box shows the code.
+The _FindVirtualMethod_ function is used for looking up a virtual method inside its _receiver_ object, following box shows the code.
 
 {% highlight C %}
 420static ArtMethod* FindVirtualMethod(mirror::Object* receiver, ArtMethod* method)
@@ -90,7 +90,7 @@ The _FindVirtualMethod_ function is used for lookuping a virtual method inside i
 423}
 {% endhighlight %}
 
-The above code calls the _FindVirtualMethodForVirtualOrInterface_ function (line 422) defined in [class-inl.h](http://androidxref.com/6.0.1_r10/xref/art/runtime/mirror/class-inl.h#399) for lookuping the target _method_.
+The above code calls the _FindVirtualMethodForVirtualOrInterface_ function (line 422) defined in [class-inl.h](http://androidxref.com/6.0.1_r10/xref/art/runtime/mirror/class-inl.h#399) for looking up the target _method_.
 The following box show the __FindVirtualMethodForVirtualOrInterface__'s code
 
 {% highlight C %}
@@ -144,13 +144,13 @@ So, what do the function _ShouldHaveEmbeddedImtAndVTable_ do?
 {% endhighlight %}
 
 If the function _IsInstantiable_ returns True, the target class has an embedded vtable.
-Ok now we know that virtual methods called by JNI are lookuped using the *vtable_* (embedded or not). 
+Ok now we know that virtual methods called by JNI are looked up using the *vtable_* (embedded or not). 
 
 let's try to figure out how the runtime invoke methods called by reflection.
-The function involved in reflection calls is _InvokeMethod_ defined in [reflection.cc](http://androidxref.com/6.0.1_r10/xref/art/runtime/reflection.cc#560). The target method to invoke is lookuped using the following code (line 600):
+The function involved in reflection calls is _InvokeMethod_ defined in [reflection.cc](http://androidxref.com/6.0.1_r10/xref/art/runtime/reflection.cc#560). The target method to invoke is looked up using the following code (line 600):
 
 {% highlight C %}
-  if (!m->IsStatic()) {
+586  if (!m->IsStatic()) {
 587    // Replace calls to String.<init> with equivalent StringFactory call.
 588    if (declaring_class->IsStringClass() && m->IsConstructor()) {
 589      jmethodID mid = soa.EncodeMethod(m);
@@ -169,7 +169,7 @@ The function involved in reflection calls is _InvokeMethod_ defined in [reflecti
 602  }
 {% endhighlight %}
 
-Finally, the lookuped method is invoked at line 640:
+Finally, the looked up method is invoked at line 640:
 
 {% highlight C %}
 630  // Invoke the method.
@@ -185,7 +185,7 @@ Finally, the lookuped method is invoked at line 640:
 640  InvokeWithArgArray(soa, m, &arg_array, &result, shorty);
 {% endhighlight %}
 
-Once we understand how the runtime lookups virtual methods, we can exploit this mechanism to achieve java virtual methods hooking.
+Once we understand how the runtime lookup virtual methods, we can exploit this mechanism to achieve java virtual methods hooking.
 
 Next post introduces ARTHook, an easy-to-use library for hooking virtual methods calls under the ART runtime.
 
