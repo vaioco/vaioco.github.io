@@ -55,13 +55,13 @@ ARTHook is composed by three elements:
 The core is written in C and the other parts are in Java. The API bridge permits the communication with the core from the user-defined Java patch code. Users can defines they own "patch" methods using Java language, this facility permits to use Android API inside the "patch" method code.
 
 Let's start explaining the Java API bridge.
-At this time there is only one exposed API: _callOriginalMethod_ calls the original hooked method implementation. Its signature is:
+At this time there is only one exposed API: _callOriginalMethod_ calls the original method. Its signature is:
 
 {% highlight Java linenos %}
 public static native Object callOriginalMethod(String key, Object thiz, Object[] args);
 {% endhighlight %}
 
-The first argument is the 'unique key' used for identify the hooked method's original implementation to call, the second one is the _thiz_ object and the last one is the arguments array. Suppose the hooked method is _GetDeviceID_ within _TelephonyManager_ class, the unique key used by the framework to identify that method is: XXX
+The first argument is the 'unique key' used to identify the hooked method's original implementation to call, the second one is the _thiz_ object and the last one is the arguments array. Suppose the hooked method is _GetDeviceID_ within _TelephonyManager_ class, the unique key used by the framework to identify that method is: XXX
 Basically, it is the concatenation of classname, methodname and method signature.
 
 The "patch" code contains the alternative code to execute when a call is hooked, users can define they own "patch" code and use any Android API (also methods which are hooked).
