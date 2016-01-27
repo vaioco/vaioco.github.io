@@ -87,4 +87,4 @@ To define target methods to hook, users have to write a JSON formatted configura
 </config>	
 {% endhighlight %}
 
-Click [here!]({% post_url 2016-01-27-arthook-howto %}) for an easy to follow step-by-step instructions for howto build and use ARTHook.
+Click [here!]({% post_url /ART/2016-01-27-arthook-howto %}) for an easy to follow step-by-step instructions for howto build and use ARTHook.
