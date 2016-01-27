@@ -21,9 +21,9 @@ ART uses two new files formats:
 
 dex2oat utility takes a DEX file as input and produces an OAT file as output, the compiled application is device-dependent. The resulting OAT file will be generated inside the "/data/dalvik-cache/\<arch>" folder, where \<arch> is the target architecture of the compilation. (i.e. architecture of the device). 
 
-OAT file format is developed by Google, it is embedded into an ELF file format. It contains DEX code, compiled native code and metadata. OAT files are loaded into application like a shared object.
+OAT file format is developed by Google, it is embedded into an ELF file format. An OAT file contains DEX code, compiled native code and metadata. OAT files are loaded like a shared object.
 
-Android framework JARs are compiled at the first device boot (OEM devices can act different, boot image is precompiled inside the firmware) , the resulting files are _boot.art_, the **image file**, and _boot.oat_.
+Android framework JARs are compiled at the first device boot (OEM devices can act different, boot image is precompiled for that device model), the resulting files are _boot.art_ (the **image file**) and _boot.oat_.
 The image file is placed in memory right before the **boot.oat**, which links to it.
 
 ![My helpful screenshot]({{ site.url }}/assets/imgs/file_formats.png)
