@@ -64,7 +64,7 @@ public static native Object callOriginalMethod(String key, Object thiz, Object[]
 The first argument is the 'unique key' used to identify the hooked method's original implementation to call, the second one is the _thiz_ object and the last one is the arguments array. Suppose the hooked method is _GetDeviceID_ within _TelephonyManager_ class, the unique key used by the framework to identify that method is: XXX
 Basically, it is the concatenation of classname, methodname and method signature.
 
-The "patch" code contains the alternative code to execute when a call is hooked, users can define they own "patch" code and use any Android API (also methods which are hooked).
+The "patch" code contains the alternative code to execute when a call is hooked, users can define they own "patch" code and use any Android API methods (also method which is hooked).
 
 {% highlight Java linenos %}
 package org.test.patchcode
