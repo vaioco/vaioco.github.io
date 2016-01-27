@@ -40,6 +40,15 @@
         <h1><a href="{{ site.url }}{{ page.url }}" rel="bookmark" title="{{ page.title }}">{{ page.title }}</a></h1>
       {% endif %}
     </div><!--/ .headline-wrap -->
+    <!-- Look the author details up from the site config. -->
+    {% assign author = site.data.authors[page.author] %}
+    <p class="byline">
+    <!-- Output author details if some exist. -->
+    {% if author %}
+            <!-- Personal Info. -->
+          <em>  Written by <a href="{{ author.web }}" target="_blank">{{ author.name }}</a> </em><br/>
+    {% endif %}
+    </p>
     <div class="article-wrap">
       {{ content }}
       <hr />
