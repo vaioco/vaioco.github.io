@@ -20,7 +20,7 @@ ARTHook has various advantages respects to other projects like "APIMonitor", "Dr
 1. you don't have to modify the target application's code
 2. you don't have to modify the Android framework
 3. it works on real-world devices as well
-4. it works with Marshmallow
+4. it works on Marshmallow
 
 The first permits to analyze also applications which uses tampering protection. This kind of protections allows an application to discover if it was tampered by an attacker, modify the classes.dex by inserting bytecode will be defeated by that protections.
 
