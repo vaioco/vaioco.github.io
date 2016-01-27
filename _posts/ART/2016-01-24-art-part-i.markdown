@@ -1,6 +1,7 @@
 ---
 layout: post
 title: ART Part I
+author: vaioco
 modified:
 categories: ART
 excerpt:
@@ -10,7 +11,6 @@ image:
 date: 2016-01-24T02:44:52+01:00
 ---
 
-## ART runtime ##
 Google has replaced ([AOSP commit](https://android-review.googlesource.com/#/c/98553/)) the Dalvik (DVM) runtime  with the ART runtime, Dalvik is no longer available from Android 5.0.
 ART introduces Ahead-of-time (AOT) compilation, at installation time ART compiles applications using the on-device **dex2oat**. 
 

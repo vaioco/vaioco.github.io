@@ -1,6 +1,7 @@
 ---
 layout: post
 title: ART Part II - Hooking
+author: vaioco
 modified:
 categories: ART
 excerpt:

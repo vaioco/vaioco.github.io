@@ -1,6 +1,7 @@
 ---
 layout: post
 title: ART Part III - ARTHook Framework
+author: vaioco
 modified:
 categories: ART
 excerpt:
@@ -10,11 +11,11 @@ image:
 date: 2016-01-25T16:40:36+01:00
 ---
 
-What is [ARTHook](https://github.com/vaioco/art-hooking-vtable)? It is an easy-to-use library for hooking virtual methods call under ART runtime. The thing is: you can override any virtual methods with your own one and thus hooking on every method call. 
+What is [ARTHook](https://github.com/vaioco/art-hooking-vtable)? It is an easy-to-use framework for hooking virtual methods call under ART runtime. The thing is: you can override any virtual methods with your own one and thus hooking on every method call. 
 Imagine you want to intercept calls to a virtual method. You have to define your own Java method and by using ARTHook API you can override the target method. All future calls to the target method will be intercepted and they will go to your own method.
 
 What are the differences from state of the art?
-ARTHook has various advantages respects to other projects like "APIMonitor", "DroidBox", Xposed" :
+ARTHook has various advantages respects to other projects like "APIMonitor", "DroidBox", "Cuckoo-Droid", "Xposed" :
 
 1. you don't have to modify the target application's code
 2. you don't have to modify the Android framework
@@ -26,6 +27,8 @@ The first permits to analyze also applications which uses tampering protection. 
 
 Moreover, you don't need to modify the Android framework or recompiling AOSP from source.
 Finally you are able to implement the analysis system on real-world devices as well.
+
+ARTHook is based on library injection and hooking virtual methods by vtable tampering.
 
 All the things you need are:
 
@@ -50,3 +53,38 @@ ARTHook is composed by three elements:
 * Java "patch" code
 
 The core is written in C and the other parts are in Java. The API bridge permits the communication with the core from the user-defined Java patch code. Users can defines they own "patch" methods using Java language, this facility permits to use Android API inside the "patch" method code.
+
+Let's start explaining the Java API bridge.
+At this time there is only one exposed API: _callOriginalMethod_ calls the original hooked method implementation. Its signature is:
+
+{% highlight Java linenos %}
+public static native Object callOriginalMethod(String key, Object thiz, Object[] args);
+{% endhighlight %}
+
+The first argument is the 'unique key' used for identify the hooked method's original implementation to call, the second one is the _thiz_ object and the last one is the arguments array. Suppose the hooked method is _GetDeviceID_ within _TelephonyManager_ class, the unique key used by the framework to identify that method is: XXX
+Basically, it is the concatenation of classname, methodname and method signature.
+
+The "patch" code contains the alternative code to execute when a call is hooked, users can define they own "patch" code and use any Android API (also methods which are hooked).
+
+{% highlight Java linenos %}
+package org.test.patchcode
+
+public class MyPatchCode{
+	public String getDeviceId(){
+		String key = ""; //dictionary key
+		Object[] args = {}; //method's args
+		// adding custom string to original result
+		// note: "this" will be taken from stackframe, it will be a "TelephonyManager" obj
+		return (String) callOriginalMethod(key, this, arg) + "w00tw00t!!" ;
+	}
+}
+{% endhighlight %}
+
+To define target methods to hook, users have to write a JSON formatted configuration file like the following one:
+
+{% highlight json linenos %}
+<config>
+</config>	
+{% endhighlight %}
+
+Click [here]() for an easy to follow step-by-step instructions for howto build and use ARTHook.
