@@ -27,15 +27,13 @@ kramdown:
 
 # Site owner
 owner:
-  name: Valerio Costamagna
+  name: Valerio `sid` Costamagna
   avatar: ysoserial.png
   bio: "questa e' la mia bio"
   email: "valerio.costamagna.AT.di.unito.it"
   twitter: "vaio_co"
   github: "vaioco"
 
-author:
-  twitter: vaioco
 
 include: [".htaccess"]
 exclude: ["lib", "config.rb", "Capfile", "config", "log", "Rakefile", "Rakefile.rb", "tmp", "less", "*.sublime-project", "*.sublime-workspace", "test", "spec", "Gruntfile.js", "package.json", "node_modules", "Gemfile", "Gemfile.lock", "LICENSE", "README.md"]
