@@ -68,6 +68,9 @@ The "patch" code contains the alternative code to execute when a call is hooked,
 {% highlight Java linenos %}
 package org.test.patchcode
 
+// import Java API bridge
+import org.sid.arthook.javabridge.*
+
 public class MyPatchCode{
 	public String getDeviceId(){
 		String key = ""; //dictionary key
@@ -79,7 +82,7 @@ public class MyPatchCode{
 }
 {% endhighlight %}
 
-To define target methods to hook, users have to write a JSON formatted configuration file like the following one:
+Target methods are defined by configuration file using JSON format:
 
 {% highlight json linenos %}
 <config>
