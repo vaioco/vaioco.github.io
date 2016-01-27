@@ -10,9 +10,7 @@ image:
 date: 2016-01-25T16:40:36+01:00
 ---
 
-### ARTHook ###
-
-What is ARTHook? It is an easy-to-use library for hooking virtual methods call under ART runtime. The thing is: you can override any virtual methods with your own one and thus hooking on every method call. 
+What is [ARTHook](https://github.com/vaioco/art-hooking-vtable)? It is an easy-to-use library for hooking virtual methods call under ART runtime. The thing is: you can override any virtual methods with your own one and thus hooking on every method call. 
 Imagine you want to intercept calls to a virtual method. You have to define your own Java method and by using ARTHook API you can override the target method. All future calls to the target method will be intercepted and they will go to your own method.
 
 What are the differences from state of the art?
