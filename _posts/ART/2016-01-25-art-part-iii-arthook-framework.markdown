@@ -11,7 +11,7 @@ image:
 date: 2016-01-25T16:40:36+01:00
 ---
 
-What is [ARTHook](https://github.com/vaioco/art-hooking-vtable)? It is an easy-to-use framework for hooking virtual methods call under ART runtime. The thing is: you can override any virtual methods with your own one and thus hooking on every method call. 
+What is [ARTHook](https://github.com/vaioco/art-hooking-vtable)? It is an easy-to-use framework for hooking virtual methods call under ART runtime. The thing is: you can override any virtual methods with your own one and thus hooking on every method call. ARTHook is based on library injection and hooking virtual methods by vtable tampering. 
 Imagine you want to intercept calls to a virtual method. You have to define your own Java method and by using ARTHook API you can override the target method. All future calls to the target method will be intercepted and they will go to your own method.
 
 What are the differences from state of the art?
@@ -22,17 +22,12 @@ ARTHook has various advantages respects to other projects like "APIMonitor", "Dr
 3. it works on real-world devices as well
 4. it works on Marshmallow
 
-The first permits to analyze also applications which uses tampering protection. This kind of protections allows an application to discover if it was tampered by an attacker, modify the classes.dex by inserting bytecode will be defeated by that protections.
+Target application's code is unmodified allowing to analyze applications which uses integrity checking without needing of a manual reverse-engineering effort to disable integrity checks. Moreover, you don't need to modify the Android framework or recompiling AOSP from source.
+Finally you are able to implement the analysis system on real-world devices as well. This feature is realy useful, expecially when dealing with malware. As the techniques for Android malware detection are progressing, malware also fights back through deploying advanced code encryption and emulation detection techniques. Malware can employ various anti-analysis techniques for emulator or VM evasion. (XXX ref)
 
-Moreover, you don't need to modify the Android framework or recompiling AOSP from source.
-Finally you are able to implement the analysis system on real-world devices as well.
+The ARTHook furter supports loading "patch" code (code which override target method) from DEX file. This enable the "patch" code to be written in Java and thus semplifies interacting with the target application and the Android framework (Context, etc...).
 
-ARTHook is based on library injection and hooking virtual methods by vtable tampering.
-
-All the things you need are:
-
-* "patch" method implementation
-* root privilege on the target device
+ARTHook uses [ADBI]() from Collin Mulliner and requires the root privilege on the device.
 
 ## How does ARTHook works? ##
 
@@ -45,13 +40,13 @@ Next question was, how do I retrive the _vtable\__ from within the Class data st
 
 The last step is load our own method implementation into the application's memory. We use the DexClassLoader using a DEX file as container. Finally we just need to change the target method's pointer make pointing it to your own method.
 
-ARTHook is composed by three elements:
+ARTHook consists of three component:
 
 * core
 * Java API bridge
-* Java "patch" code
+* Java "patch" code (defined by users)
 
-The core is written in C and the other parts are in Java. The API bridge permits the communication with the core from the user-defined Java patch code. Users can defines they own "patch" methods using Java language, this facility permits to use Android API inside the "patch" method code.
+The core is written in C. The API bridge permits the communication with the core from the user-defined Java "patch" code. Users can defines they own "patch" methods using Java language, this facility permits to use Android API inside the "patch" method code.
 
 Let's start explaining the Java API bridge.
 At this time there is only one exposed API: _callOriginalMethod_ calls the original method. Its signature is:
@@ -85,8 +80,24 @@ public class MyPatchCode{
 Target methods are defined by configuration file using JSON format:
 
 {% highlight json linenos %}
-<config>
-</config>	
+{"config": {
+    "debug": 1,
+    "dex": "target.dex",
+    "hooks": [
+    {
+	"class-name": "android/telephony/TelephonyManager",
+	"method-name": "getDeviceId",
+	"method-sig": "()Ljava/lang/String;",
+	"hook-cls-name": "org/sid/arthookbridge/HookCls"
+    },
+	[...]	
 {% endhighlight %}
+
+Line 2 enable debug logs, line 3 is the DEX file with "patch" code and the element "hooks" is a list of target methods, where:
+
+* class-name : class name which contains target virtual method
+* method-name : target method name
+* method-sig : target method signature
+* hook-cls-name : "patch" code class name
 
 Click [here!]({% post_url /ART/2016-01-27-arthook-howto %}) for an easy to follow step-by-step instructions for howto build and use ARTHook.
