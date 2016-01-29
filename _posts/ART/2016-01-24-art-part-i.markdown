@@ -21,9 +21,9 @@ ART uses two new file formats:
 
 _dex2oat_ compiles a DEX file in input to an OAT file, the compiled application is device-dependent. The resulting OAT file will be generated inside the "/data/dalvik-cache/\<arch>" folder, where \<arch> is the target architecture of the compilation. (i.e. architecture of the device). 
 
-OAT file format is developed by Google, it is embedded into an ELF. An OAT file contains DEX code, compiled native code and metadata. OAT files are loaded into the application virtual memory like a shared object.
+OAT file format is developed by Google, it is embedded into an ELF. An OAT file contains DEX code, compiled native code and metadata. OAT files are loadedin application virtual memory like a shared object.
 
-Android framework JARs are compiled at the first device boot (maybe OEM devices can act different), the resulting files are _boot.art_ (the **image file**) and _boot.oat_.
+Android framework JARs are compiled at the first device boot (maybe OEM devices can act differently), the resulting files are _boot.art_ (the **image file**) and _boot.oat_.
 The **boot.art** is placed in memory right before the **boot.oat**, which links to it.
 
 ![My helpful screenshot]({{ site.url }}/assets/imgs/file_formats.png)
@@ -32,7 +32,7 @@ Runtime flow is pictured into the following image:
 
 ![asd]({{ site.url }}/assets/imgs/runtime_flow.png)
 
-This journey into ART runtime is focused on discover how Java virtual methods are called and implemented by the runtime. Basically, how ART runtime implements things like Java polymorphism and eredità(XXX).
+This journey into ART runtime is focused on discover how Java virtual methods are called and managed by the runtime. 
 
 ## ART Data Struct
 
@@ -43,7 +43,7 @@ For our scope the useful ART Data Structures (ADS) are:
 1. **Class** ([androidxref](http://androidxref.com/6.0.1_r10/xref/art/runtime/mirror/class.h))
 2. **ArtMethod** ([androidxref](http://androidxref.com/6.0.1_r10/xref/art/runtime/art_method.h))
 
-The _Class_ data structure define the Java class memory-layout, the following two members are used to lookup virtual methods:
+The _Class_ data structure define the Java classes memory-layout, the following two members are used to lookup virtual methods:
 
 {% highlight C linenos %}
 1220  // Virtual method table (vtable), for use by "invoke-virtual".  The vtable from the superclass is
@@ -56,9 +56,9 @@ The _Class_ data structure define the Java class memory-layout, the following tw
 1247  uint64_t virtual_methods_;
 {% endhighlight %}
 
-The _vtable\__ is a reference to an array of pointers. Each array's element is a pointer to a virtual method defined inside that Java class or to a virtual method from the superclass. Instead, virtual_methods\__ is a reference to an array of pointers to virtual methods defined inside that class, each element is a pointer to an _ArtMethod_ object.
+The _vtable\__ is a reference to an array of pointers. Each array element is a pointer to a virtual method defined inside that Java class or to a virtual method from the superclass. Instead, _virtual\_methods\__ is a reference to an array of pointers to virtual methods defined inside that class, each element is a pointer to an _ArtMethod_ object.
 
-_ArtMethod_ is the C++ class which define a Java method memory-layout, its interesting elements are: 
+_ArtMethod_ is the C++ class which define the Java methods memory-layout, its interesting elements are: 
 
 {% highlight C linenos %}
 544  GcRoot<mirror::Class> declaring_class_;
@@ -70,16 +70,15 @@ _ArtMethod_ is the C++ class which define a Java method memory-layout, its inter
 568  uint32_t method_index_;
 {% endhighlight %}
 
-_declaring\_class\__, line 544, is a reference to the class whithin method is defined. The _access\_flags\__ is used for set the class visibility (public, static, native, interface, etc..) and _method\_index\__ is the method's index value inside the vtable.
+_declaring\_class\__, line 544, is a reference to the class whithin method is defined. The _access\_flags\__ is used for set the class visibility (public, static, native, interface, etc..) and _method\_index\__ is the method's index value inside vtable_.
 
 Before starting the real fun, let me introduce my debugging envinronment.
 
-### Be comfortable with the environment ###
+### Debugging tips ###
 
 I suggest to you to use Ubuntu for building from AOSP ( or debian is likely as well). I used a Nexus6 with AOSP,my running version at the writing time is XXX
 
-I will use GDB as debugger, radare is a very good alternative, with AOSP symbols.
-Be comfortable means leverage on scripts for simplify the exploration, first create a directory with links to the AOSP symbols.
+I'm going to use GDB as debugger, radare is a very good alternative, with AOSP symbols. Create a directory with links to AOSP symbols, like the following:
 
 {% highlight bash linenos %}
 lrwxrwxrwx 1 root root   72 gen 23 15:46 app_process32 -> symbols/system/bin/app_process32
@@ -94,7 +93,7 @@ lrwxrwxrwx 1 root root   68 gen 23 15:45 libutils.so -> symbols/system/lib/libut
 lrwxrwxrwx 1 root root   58 gen 23 15:45 linker -> symbols/system/bin/linker
 {% endhighlight %}
 
-The following GDB script will set the debugging session options:
+Create a file with the following GDB command:
 
 {% highlight bash linenos %}
 target remote :1337
@@ -107,9 +106,7 @@ Port 1337 will be used for connecting to the debugger instance running on the de
 adb forward tcp:1337 tcp:1337
 {% endhighlight %}
 
-I prefer to use GDB from AOSP toolchain.
-
-### Debugging for fun and profit ###
+### Hands on debugger ###
 
 A Java class loaded in memory has a structure looks like the following one:
 
