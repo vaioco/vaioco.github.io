@@ -12,19 +12,19 @@ date: 2016-01-24T02:44:52+01:00
 ---
 
 Google has replaced ([AOSP commit](https://android-review.googlesource.com/#/c/98553/)) the Dalvik (DVM) runtime  with the ART runtime, Dalvik is no longer available from Android 5.0.
-ART introduces Ahead-of-time (AOT) compilation, at installation time ART compiles applications using the on-device **dex2oat**. 
+ART introduces Ahead-of-time (AOT) compilation, at installation time ART compiles applications using the on-device **dex2oat** tool. 
 
-ART uses two new files formats:
+ART uses two new file formats:
 
 + .ART: only one file, **boot.art** in "/system/framework/\<arch>". Image file with a heap of preinitialized classes and objects
 + .OAT: Master file **boot.oat** in "/system/framework/\<arch>". Compiled application will be saved as OAT file.
 
-dex2oat utility takes a DEX file as input and produces an OAT file as output, the compiled application is device-dependent. The resulting OAT file will be generated inside the "/data/dalvik-cache/\<arch>" folder, where \<arch> is the target architecture of the compilation. (i.e. architecture of the device). 
+_dex2oat_ compiles a DEX file in input to an OAT file, the compiled application is device-dependent. The resulting OAT file will be generated inside the "/data/dalvik-cache/\<arch>" folder, where \<arch> is the target architecture of the compilation. (i.e. architecture of the device). 
 
-OAT file format is developed by Google, it is embedded into an ELF file format. An OAT file contains DEX code, compiled native code and metadata. OAT files are loaded like a shared object.
+OAT file format is developed by Google, it is embedded into an ELF. An OAT file contains DEX code, compiled native code and metadata. OAT files are loaded into the application virtual memory like a shared object.
 
-Android framework JARs are compiled at the first device boot (OEM devices can act different, boot image is precompiled for that device model), the resulting files are _boot.art_ (the **image file**) and _boot.oat_.
-The image file is placed in memory right before the **boot.oat**, which links to it.
+Android framework JARs are compiled at the first device boot (maybe OEM devices can act different), the resulting files are _boot.art_ (the **image file**) and _boot.oat_.
+The **boot.art** is placed in memory right before the **boot.oat**, which links to it.
 
 ![My helpful screenshot]({{ site.url }}/assets/imgs/file_formats.png)
 
@@ -32,13 +32,18 @@ Runtime flow is pictured into the following image:
 
 ![asd]({{ site.url }}/assets/imgs/runtime_flow.png)
 
-## ART Data Structures
-The ART Data Structures (ADS) useful for our interests are:
+This journey into ART runtime is focused on discover how Java virtual methods are called and implemented by the runtime. Basically, how ART runtime implements things like Java polymorphism and eredità(XXX).
 
-1. Class ([androidxref](http://androidxref.com/6.0.1_r10/xref/art/runtime/mirror/class.h))
-2. ArtMethod ([androidxref](http://androidxref.com/6.0.1_r10/xref/art/runtime/art_method.h))
+## ART Data Struct
 
-The _Class_ data structure define the layout of a Java class, the following two members are used for looking up virtual methods:
+The ART runtime is written in C++, so things are implemented by C++ class, we are going to exploits ART's data structures for hooking Java virtual methods by vtable tampering.
+
+For our scope the useful ART Data Structures (ADS) are:
+
+1. **Class** ([androidxref](http://androidxref.com/6.0.1_r10/xref/art/runtime/mirror/class.h))
+2. **ArtMethod** ([androidxref](http://androidxref.com/6.0.1_r10/xref/art/runtime/art_method.h))
+
+The _Class_ data structure define the Java class memory-layout, the following two members are used to lookup virtual methods:
 
 {% highlight C linenos %}
 1220  // Virtual method table (vtable), for use by "invoke-virtual".  The vtable from the superclass is
@@ -51,9 +56,9 @@ The _Class_ data structure define the layout of a Java class, the following two 
 1247  uint64_t virtual_methods_;
 {% endhighlight %}
 
-The _vtable\__ is a reference to an array of pointers. Each element is a pointer to a virtual method defined inside that class or to a virtual method from the superclass. Instead, virtual_methods\__ is a reference to an array of pointers to virtual methods defined inside that class, each element type is _ArtMethod_.
+The _vtable\__ is a reference to an array of pointers. Each array's element is a pointer to a virtual method defined inside that Java class or to a virtual method from the superclass. Instead, virtual_methods\__ is a reference to an array of pointers to virtual methods defined inside that class, each element is a pointer to an _ArtMethod_ object.
 
-_ArtMethod_ is the C++ class which define the Java method structure, its interesting elements are: 
+_ArtMethod_ is the C++ class which define a Java method memory-layout, its interesting elements are: 
 
 {% highlight C linenos %}
 544  GcRoot<mirror::Class> declaring_class_;
@@ -65,22 +70,16 @@ _ArtMethod_ is the C++ class which define the Java method structure, its interes
 568  uint32_t method_index_;
 {% endhighlight %}
 
-_declaring\_class\__, line 544, is a reference to the class which define the method. The _access\_flags\__ is used for set the class visibility (public, static, native, interface, etc..) and _method\_index\__ contains the method's index value inside the vtable.
+_declaring\_class\__, line 544, is a reference to the class whithin method is defined. The _access\_flags\__ is used for set the class visibility (public, static, native, interface, etc..) and _method\_index\__ is the method's index value inside the vtable.
 
-Before starting the real fun, let me introduce my work envinronment.
+Before starting the real fun, let me introduce my debugging envinronment.
 
 ### Be comfortable with the environment ###
 
-I suggest to you to use Ubuntu for building from AOSP ( or debian is likely as well). I used a Nexus6 with AOSP, y running version at the writing time is XXX
+I suggest to you to use Ubuntu for building from AOSP ( or debian is likely as well). I used a Nexus6 with AOSP,my running version at the writing time is XXX
 
-The requirements are the following:
-
-* Android SDK
-* Android NDK
-* device/emulator with AOSP build (refer to [building AOSP](https://source.android.com/source/initializing.html))
-
-I will use GDB as debugger, radare is a very good alternative, and the symbols taken from the AOSP build.
-Be comfortable means uses scripts for simplify your exploration, first create a directory with links to the symbols you need. For our purposes we need the following symbols:
+I will use GDB as debugger, radare is a very good alternative, with AOSP symbols.
+Be comfortable means leverage on scripts for simplify the exploration, first create a directory with links to the AOSP symbols.
 
 {% highlight bash linenos %}
 lrwxrwxrwx 1 root root   72 gen 23 15:46 app_process32 -> symbols/system/bin/app_process32
@@ -95,20 +94,20 @@ lrwxrwxrwx 1 root root   68 gen 23 15:45 libutils.so -> symbols/system/lib/libut
 lrwxrwxrwx 1 root root   58 gen 23 15:45 linker -> symbols/system/bin/linker
 {% endhighlight %}
 
-The following GDB script will set the debugging session options
+The following GDB script will set the debugging session options:
 
 {% highlight bash linenos %}
 target remote :1337
 set solib-search-path .
 {% endhighlight %}
 
-The port 1337 will be used for connecting to the debugger instance running on the device, we have to forward the port with the adb utility running the following command:
+Port 1337 will be used for connecting to the debugger instance running on the device, we have to forward this port using adb utility. run the following command:
 
 {% highlight bash linenos %}
 adb forward tcp:1337 tcp:1337
 {% endhighlight %}
 
-I prefer to use the GDB from the AOSP toolchain, but the one from NDK should works as well.
+I prefer to use GDB from AOSP toolchain.
 
 ### Debugging for fun and profit ###
 
@@ -141,7 +140,7 @@ $48 = {
 }
 {% endhighlight %}
 
-_virtual\_methods\__ is a reference to an "art::mirror::ObjectArray<art::mirror::ArtMethod> >>", an array of _ArtMethod_ objects. 
+_virtual\_methods\__ is a reference to an "art::mirror::ObjectArray<art::mirror::ArtMethod> >>": an array of _ArtMethod_ objects. 
 
 {% highlight bash linenos %}
 (gdb) p/x ((art::mirror::Class *)0x7110bf10)->virtual_methods_
@@ -164,7 +163,7 @@ $23 = {
 {% endhighlight %}
 
 
-### References ###
+### References
 
 * [Fuzzing_Objects_d_ART_hitbsecconf2015ams_WP.pdf](http://census-labs.com/media/Fuzzing_Objects_d_ART_hitbsecconf2015ams_WP.pdf)
 * [asia-15-Sabanal-Hiding-Behind-ART-wp.pdf](https://www.blackhat.com/docs/asia-15/materials/asia-15-Sabanal-Hiding-Behind-ART-wp.pdf)
