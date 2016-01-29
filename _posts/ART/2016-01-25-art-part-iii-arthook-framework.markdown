@@ -11,8 +11,14 @@ image:
 date: 2016-01-25T16:40:36+01:00
 ---
 
-What is [ARTHook](https://github.com/vaioco/art-hooking-vtable)? It is an easy-to-use framework for hooking virtual methods call under ART runtime. The thing is: you can override any virtual methods with your own one and thus hooking on every method call. ARTHook is based on library injection and hooking virtual methods by vtable tampering. 
-Imagine you want to intercept calls to a virtual method. You have to define your own Java method and by using ARTHook API you can override the target method. All future calls to the target method will be intercepted and they will go to your own method.
+{% comment %}
+	la ciccia in culo
+{% endcomment %}
+
+What is [ARTHook](https://github.com/vaioco/art-hooking-vtable)? It is an easy-to-use framework for hooking virtual methods calls under ART runtime. 
+
+The thing is: you can override any virtual methods with your own one and thus hooking on every method call. ARTHook is based on library injection and hooking virtual methods by vtable tampering. 
+Imagine you want to intercept calls to a virtual method. You have to define your own Java method and by using ARTHook API you can override the target method. All future calls to the target method will be intercepted and they will go to your own Java method.
 
 What are the differences from state of the art?
 ARTHook has various advantages respects to other projects like "APIMonitor", "DroidBox", "Cuckoo-Droid", "Xposed" :
@@ -22,8 +28,10 @@ ARTHook has various advantages respects to other projects like "APIMonitor", "Dr
 3. it works on real-world devices as well
 4. it works on Marshmallow
 
-Target application's code is unmodified allowing to analyze applications which uses integrity checking without needing of a manual reverse-engineering effort to disable integrity checks. Moreover, you don't need to modify the Android framework or recompiling AOSP from source.
-Finally you are able to implement the analysis system on real-world devices as well. This feature is realy useful, expecially when dealing with malware. As the techniques for Android malware detection are progressing, malware also fights back through deploying advanced code encryption and emulation detection techniques. Malware can employ various anti-analysis techniques for emulator or VM evasion. (XXX ref)
+Target application's code is unmodified allowing to analyze applications which uses _integrity checking_ techniques, without needing of a manual reverse-engineering effort to disable integrity checks. 
+
+Moreover, you don't need to modify the Android framework or rebuild AOSP or any of its components.
+Lastly you are able to implement the analysis system on real-world devices as well. This feature is realy useful, expecially when dealing with malware. As the techniques for Android malware detection are progressing, malware also fights back through deploying advanced code encryption and emulation detection techniques ([Rage against the virtual machine: hindering dynamic analysis of android malware.](http://www.cs.columbia.edu/~mikepo/papers/ratvm.eurosec14.pdf))
 
 The ARTHook furter supports loading "patch" code (code which override target method) from DEX file. This enable the "patch" code to be written in Java and thus semplifies interacting with the target application and the Android framework (Context, etc...).
 
@@ -49,16 +57,19 @@ ARTHook consists of three component:
 The core is written in C. The API bridge permits the communication with the core from the user-defined Java "patch" code. Users can defines they own "patch" methods using Java language, this facility permits to use Android API inside the "patch" method code.
 
 Let's start explaining the Java API bridge.
-At this time there is only one exposed API: _callOriginalMethod_ calls the original method. Its signature is:
+
+* _callOriginalMethod_: allows to call the original method. Its signature is:
 
 {% highlight Java linenos %}
 public static native Object callOriginalMethod(String key, Object thiz, Object[] args);
 {% endhighlight %}
 
-The first argument is the 'unique key' used to identify the hooked method's original implementation to call, the second one is the _thiz_ object and the last one is the arguments array. Suppose the hooked method is _GetDeviceID_ within _TelephonyManager_ class, the unique key used by the framework to identify that method is: XXX
+First argument is the 'unique key' used to identify original method from dictionary data structure, the second one is the _this_ object and the last one is the arguments array. 
+
+Suppose the method you want to hook is _GetDeviceID_ within _TelephonyManager_ class, the key used by the framework to identify that method is: XXX
 Basically, it is the concatenation of classname, methodname and method signature.
 
-The "patch" code contains the alternative code to execute when a call is hooked, users can define they own "patch" code and use any Android API methods (also method which is hooked).
+The "patch" code contains the alternative code to execute when a call is hooked, users can define they own "patch" code. The following is an example of a "patch" method for _getDeviceId_ API method :
 
 {% highlight Java linenos %}
 package org.test.patchcode
@@ -77,7 +88,7 @@ public class MyPatchCode{
 }
 {% endhighlight %}
 
-Target methods are defined by configuration file using JSON format:
+Target methods are defined by JSON configuration file:
 
 {% highlight json linenos %}
 {"config": {
@@ -93,7 +104,7 @@ Target methods are defined by configuration file using JSON format:
 	[...]	
 {% endhighlight %}
 
-Line 2 enable debug logs, line 3 is the DEX file with "patch" code and the element "hooks" is a list of target methods, where:
+Line 2 switch on debug logs, line 3 is the DEX file with the "patch" methods and the "hooks" element is a list of target methods, where:
 
 * class-name : class name which contains target virtual method
 * method-name : target method name
