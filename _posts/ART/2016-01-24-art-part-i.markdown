@@ -11,24 +11,24 @@ image:
 date: 2016-01-24T02:44:52+01:00
 ---
 
-Google has replaced ([AOSP commit](https://android-review.googlesource.com/#/c/98553/)) the Dalvik (DVM) runtime  with the ART runtime, Dalvik is no longer available from Android 5.0.
-ART introduces Ahead-of-time (AOT) compilation, at installation time ART compiles applications using the on-device **dex2oat** tool. 
+Google has replaced ([AOSP commit](https://android-review.googlesource.com/#/c/98553/)) the Dalvik (DVM) runtime with the ART runtime as default from Android 5.0.
+ART introduces Ahead-of-time (AOT) compilation at installation time by compiling applications using the on-device **dex2oat** tool. 
 
 ART uses two new file formats:
 
 + .ART: only one file, **boot.art** in "/system/framework/\<arch>". Image file with a heap of preinitialized classes and objects
 + .OAT: Master file **boot.oat** in "/system/framework/\<arch>". Compiled application will be saved as OAT file.
 
-_dex2oat_ compiles a DEX file in input to an OAT file, the compiled application is device-dependent. The resulting OAT file will be generated inside the "/data/dalvik-cache/\<arch>" folder, where \<arch> is the target architecture of the compilation. (i.e. architecture of the device). 
+_dex2oat_ compiles a DEX file in input to an OAT file, so the compiled application is device-dependent. The resulting OAT file will be generated inside the "/data/dalvik-cache/\<arch>" folder, where \<arch> is the target architecture of the compilation. (i.e. architecture of the device). 
 
-OAT file format is developed by Google, it is embedded into an ELF. An OAT file contains DEX code, compiled native code and metadata. OAT files are loadedin application virtual memory like a shared object.
+OAT file format is developed by Google, and it is embedded into an ELF. An OAT file contains DEX code, compiled native code and metadata. OAT files are loaded in application virtual memory like a shared object.
 
-Android framework JARs are compiled at the first device boot (maybe OEM devices can act differently), the resulting files are _boot.art_ (the **image file**) and _boot.oat_.
+Android framework JARs are compiled at the first step of device booting (maybe OEM devices can act differently). The outputs of compiling are _boot.art_ (the **image file**) and _boot.oat_.
 The **boot.art** is placed in memory right before the **boot.oat**, which links to it.
 
 ![My helpful screenshot]({{ site.url }}/assets/imgs/file_formats.png)
 
-Runtime flow is pictured into the following image:
+Runtime flow is showed in the following figure:
 
 ![asd]({{ site.url }}/assets/imgs/runtime_flow.png)
 
@@ -36,9 +36,9 @@ This journey into ART runtime is focused on discover how Java virtual methods ar
 
 ## ART Data Struct
 
-The ART runtime is written in C++, so things are implemented by C++ class, we are going to exploits ART's data structures for hooking Java virtual methods by vtable tampering.
+The ART runtime is written in C++, and we are going to exploits ART's data structures for hooking Java virtual methods by vtable tampering.
 
-For our scope the useful ART Data Structures (ADS) are:
+For our scope, some useful ART Data Structures (ADS) are:
 
 1. **Class** ([androidxref](http://androidxref.com/6.0.1_r10/xref/art/runtime/mirror/class.h))
 2. **ArtMethod** ([androidxref](http://androidxref.com/6.0.1_r10/xref/art/runtime/art_method.h))
@@ -56,9 +56,9 @@ The _Class_ data structure define the Java classes memory-layout, the following 
 1247  uint64_t virtual_methods_;
 {% endhighlight %}
 
-The _vtable\__ is a reference to an array of pointers. Each array element is a pointer to a virtual method defined inside that Java class or to a virtual method from the superclass. Instead, _virtual\_methods\__ is a reference to an array of pointers to virtual methods defined inside that class, each element is a pointer to an _ArtMethod_ object.
+The _vtable\__ is a reference to an array of pointers. Each array element is a pointer to a virtual method defined inside that Java class or to a virtual method from the superclass. Instead, _virtual\_methods\__ is a reference to an array of pointers to virtual methods defined inside that class, adn each element is a pointer to an _ArtMethod_ object.
 
-_ArtMethod_ is the C++ class which define the Java methods memory-layout, its interesting elements are: 
+_ArtMethod_ is the C++ class which defines the Java methods memory-layout. The interesting elements are: 
 
 {% highlight C linenos %}
 544  GcRoot<mirror::Class> declaring_class_;
@@ -76,9 +76,9 @@ Before starting the real fun, let me introduce my debugging envinronment.
 
 ### Debugging tips ###
 
-I suggest to you to use Ubuntu for building from AOSP ( or debian is likely as well). I used a Nexus6 with AOSP,my running version at the writing time is XXX
+I suggest to you to use Ubuntu for building from AOSP ( or debian is likely as well). I used a Nexus6 with AOSP,my running version at the writing time is 5.1.1.
 
-I'm going to use GDB as debugger, radare is a very good alternative, with AOSP symbols. Create a directory with links to AOSP symbols, like the following:
+I'm going to use GDB as debugger, and radare is a very good alternative, with AOSP symbols. Create a directory with links to AOSP symbols, like the following:
 
 {% highlight bash linenos %}
 lrwxrwxrwx 1 root root   72 gen 23 15:46 app_process32 -> symbols/system/bin/app_process32
@@ -100,7 +100,7 @@ target remote :1337
 set solib-search-path .
 {% endhighlight %}
 
-Port 1337 will be used for connecting to the debugger instance running on the device, we have to forward this port using adb utility. run the following command:
+Port 1337 will be used for connecting to the debugger instance running on the device. We have to forward this port by using adb with running the following command:
 
 {% highlight bash linenos %}
 adb forward tcp:1337 tcp:1337
@@ -108,7 +108,7 @@ adb forward tcp:1337 tcp:1337
 
 ### Hands on debugger ###
 
-A Java class loaded in memory has a structure looks like the following one:
+A Java class loaded in memory has a structure like the following one:
 
 {% highlight C linenos %}
 (gdb) p/x *(art::mirror::Class*) 0x70377fc0

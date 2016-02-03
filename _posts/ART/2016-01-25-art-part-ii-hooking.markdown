@@ -22,7 +22,7 @@ to the new method **B** ( the "patch" method ) within class **X**. At least you 
 3. modify the **A** entry within **Z** vtable with **B** address
 
 
-Using the _GetMethodID_ function of Java Native Interface (JNI) we can obtain the **A** memory reference (suppose **A** is already loaded in memory,true for Android APIs). The _GetMethodID_ function returns an _jobject_ type, it is just an alias to **ArtMethod** data structure.
+Using the _GetMethodID_ function of Java Native Interface (JNI) we can obtain the **A** memory reference (suppose **A** is already loaded in memory,true for Android APIs). The _GetMethodID_ function returns an _jobject_ type, which is just an alias to **ArtMethod** data structure.
 
 Using relative offset, we can access to elements inside the ArtMethod object returned by _GetMethodID_ for retriving the information needed to retrive **A** index value inside **Z** **vtable**. Relative offset approach is stable and reliable because ART internals are very unlikely to be subject of OEM modifications.
 
@@ -30,12 +30,12 @@ To achieve point 1 we use the _DexClassLoader_ API, the "patch" method **B** is 
 
 Once we have got the information scanning the memory, we can achieve point 3 using just simple memory operations by native code.
 
-Using the **A** memory reference returned by _GetMethodID_ we can parse the _ArtMethod_ structure and access to its following elements:
+Using the **A** memory reference returned by _GetMethodID_ , we can parse the _ArtMethod_ structure and access to its following elements:
 
 1. **declaring_class_**
 2. **method_index_**
 
-The former is a reference to **Z** (a **Class** object), that is the class which contains the method **A**. The latter is the **A**'s index value inside **Z** vtable.
+The former is a reference to **Z** (a **Class** object). This class contains the method **A**. The latter is the **A**'s index value inside **Z** vtable.
 
 Following the _declaring\_class\__ pointer, we can parse the **Class** object from memory to access its following elements:
 

@@ -64,12 +64,12 @@ Let's start explaining the Java API bridge.
 public static native Object callOriginalMethod(String key, Object thiz, Object[] args);
 {% endhighlight %}
 
-First argument is the 'unique key' used to identify original method from dictionary data structure, the second one is the _this_ object and the last one is the arguments array. 
+First argument is the 'unique key' used to identify original method from dictionary data structure, and the second one is the _this_ object and the last one is the arguments array. 
 
 Suppose the method you want to hook is _GetDeviceID_ within _TelephonyManager_ class, the key used by the framework to identify that method is: XXX
 Basically, it is the concatenation of classname, methodname and method signature.
 
-The "patch" code contains the alternative code to execute when a call is hooked, users can define they own "patch" code. The following is an example of a "patch" method for _getDeviceId_ API method :
+The "patch" code contains the alternative code to execute when a call is hooked. Users can define they own "patch" code. The following is an example of a "patch" method for _getDeviceId_ API method :
 
 {% highlight Java linenos %}
 package org.test.patchcode
