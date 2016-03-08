@@ -200,4 +200,4 @@ Finally, the looked up method is invoked at line 640:
 
 Once we know how the runtime is lookuping virtual methods, we can exploit this mechanism to achieve Java virtual methods hooking.
 
-Next post introduces ARTHook, an easy-to-use library for hooking virtual methods calls under ART runtime.
+Next post introduces ARTDroid, an easy-to-use library for hooking virtual methods calls under ART runtime.

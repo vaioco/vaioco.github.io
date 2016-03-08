@@ -1,11 +1,11 @@
 ---
 layout: post
-title: ARTHook HowTo
+title: ARTDroid HowTo
 author: vaioco
 modified:
 categories: ART
 excerpt:
-tags: [ARTHook, Android]
+tags: [ARTDroid, Android]
 image:
   feature:
 date: 2016-01-27T20:19:27+01:00
@@ -15,7 +15,7 @@ date: 2016-01-27T20:19:27+01:00
 * Android SDK
 * Android NDK
 * busybox installed on device/emu 
-* ADBI from Collin Mulliner (included into ARTHook as submodule)
+* ADBI from Collin Mulliner (included into ARTDroid as submodule)
 
 ## Project structure
 
@@ -31,7 +31,7 @@ date: 2016-01-27T20:19:27+01:00
 
 The framework is compiled as static library so it can be directly included into your NDK project. The shared library will be injected into the application's memory (or into zygote) using the tool _hijack_.
 
-To compile ARTHook you can use the script _build.sh_, it will produce the shared object into _arthook\_demo/libs/_. Push the following files to the device (paths are from repo root dir):
+To compile ARTDroid you can use the script _build.sh_, it will produce the shared object into _arthook\_demo/libs/_. Push the following files to the device (paths are from repo root dir):
 
 {% highlight bash linenos %}
 //pushing hijack from adbi
@@ -89,6 +89,6 @@ Defining new hooks is a very simple task, you have to follow these steps:
 }}
 {% endhighlight %}
 
-3. set the configuration file name before calling ARTHook entrypoint (refer to arthook_demo.c)
+3. set the configuration file name before calling ARTDroid entrypoint (refer to arthook_demo.c)
 
 4. shared library injection using hijack
