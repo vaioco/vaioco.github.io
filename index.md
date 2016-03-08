@@ -1,7 +1,8 @@
 ---
-layout: home
-excerpt: "A minimal Jekyll theme for your blog by designer Michael Rose."
-tags: [Jekyll, theme, responsive, blog, template]
+layout: page
+excerpt: "Valerio Costamagna homepage"
+tags: [Android, dynamic analysis, malware, security]
+share: false
 image:
   feature: aosta.jpg
 ---
