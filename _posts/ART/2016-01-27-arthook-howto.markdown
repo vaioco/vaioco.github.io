@@ -4,7 +4,7 @@ title: ARTDroid HowTo
 author: vaioco
 modified:
 categories: ART
-visible: 0
+published: false
 excerpt:
 tags: [ARTDroid, Android]
 image:
