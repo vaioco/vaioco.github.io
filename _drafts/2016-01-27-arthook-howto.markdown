@@ -2,13 +2,9 @@
 layout: post
 title: ARTDroid HowTo
 author: vaioco
-modified:
 categories: ART
 published: false
-excerpt:
 tags: [ARTDroid, Android]
-image:
-  feature:
 date: 2016-01-27T20:19:27+01:00
 ---
 ## Dependencies
