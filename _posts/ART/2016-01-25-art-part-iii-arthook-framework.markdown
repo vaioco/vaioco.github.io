@@ -111,4 +111,4 @@ Line 2 switch on debug logs, line 3 is the DEX file with the "patch" methods and
 * method-sig : target method signature
 * hook-cls-name : "patch" code class name
 
-Click [here!]({% post_url /ART/2016-01-27-arthook-howto %}) for an easy to follow step-by-step instructions for howto build and use ARTDroid.
+Click [here!]({% post_url /ART/2016-03-11-artdroid-doc %}) for an easy to follow step-by-step instructions for howto build and use ARTDroid.

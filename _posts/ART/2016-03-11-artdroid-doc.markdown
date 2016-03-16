@@ -30,7 +30,7 @@ adb root
 
 ## How to use
 
-Include the compile ARTDroid static library in your actually hooking code. In your code call the ARTDroid init function _arthook_init_conf_ specifing as first argument the configuration file.
+Include the compile ARTDroid static library in your actually hooking code. In your code call the ARTDroid init function arthook_init_conf specifing as first argument the configuration file.
 Let's discuss how to use ARTDroid by means of the demo code included in the directory "example" of this repo.  
 
 Suppose you want to hook the method android.telephony.TelephonyManager's getDeviceId. First, write your own patch code using the Java language, the following snippet code is extracted from the example:
