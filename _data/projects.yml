@@ -1,6 +1,10 @@
 # Projects data
 
 - title: ARTDroid
-  url: https:/
-  desc: descrizione ARTDroid
-
+  url: https://vaioco.github.io/art/artdroid-doc/
+  desc: ARTDroid is a framework for hooking virtual-methods calls supporting the latest Android runtime (ART). 
+      A virtual-method is called by the ART runtime using a dispatch table (vtable). 
+      ARTDroid can tamper the vtable without any modifications to both Android framework and app’s code.
+      The ARTDroid hooking framework can be used to build an efficient sandbox on real devices and monitor
+      sensitive methods called in both Java reflection and JNI ways.
+  image: ../images/android-malware.jpg

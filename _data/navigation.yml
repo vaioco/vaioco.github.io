@@ -6,8 +6,11 @@
 - title: Projects
   url: /projects/
 
-- title: Publications
-  url: /pubs/
+#- title: Publications
+#  url: /pubs/
 
 - title: Teaching
-  url: /teach/
+  url: /teaching/
+
+- title: Blog
+  url: /posts/
