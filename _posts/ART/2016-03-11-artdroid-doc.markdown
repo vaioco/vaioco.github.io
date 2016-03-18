@@ -88,7 +88,7 @@ To inject the compiled library in a target app, execute the following commands i
 {% highlight shell linenos=table %}
 
 cd /data/local/tmp
-sh init.sh (run only once to set the environment)
+sh init.sh (run only once to prepare the environment)
 sh runhijack.sh -h
 
 {% endhighlight %}
