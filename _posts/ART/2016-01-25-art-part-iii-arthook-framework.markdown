@@ -66,49 +66,4 @@ public static native Object callOriginalMethod(String key, Object thiz, Object[]
 
 First argument is the 'unique key' used to identify original method from dictionary data structure, and the second one is the _this_ object and the last one is the arguments array. 
 
-Suppose the method you want to hook is _GetDeviceID_ within _TelephonyManager_ class, the key used by the framework to identify that method is: XXX
-Basically, it is the concatenation of classname, methodname and method signature.
-
-The "patch" code contains the alternative code to execute when a call is hooked. Users can define they own "patch" code. The following is an example of a "patch" method for _getDeviceId_ API method :
-
-{% highlight Java linenos %}
-package org.test.patchcode
-
-// import Java API bridge
-import org.sid.arthook.javabridge.*
-
-public class MyPatchCode{
-	public String getDeviceId(){
-		String key = ""; //dictionary key
-		Object[] args = {}; //method's args
-		// adding custom string to original result
-		// note: "this" will be taken from stackframe, it will be a "TelephonyManager" obj
-		return (String) callOriginalMethod(key, this, arg) + "w00tw00t!!" ;
-	}
-}
-{% endhighlight %}
-
-Target methods are defined by JSON configuration file:
-
-{% highlight json linenos %}
-{"config": {
-    "debug": 1,
-    "dex": "target.dex",
-    "hooks": [
-    {
-	"class-name": "android/telephony/TelephonyManager",
-	"method-name": "getDeviceId",
-	"method-sig": "()Ljava/lang/String;",
-	"hook-cls-name": "org/sid/arthookbridge/HookCls"
-    },
-	[...]	
-{% endhighlight %}
-
-Line 2 switch on debug logs, line 3 is the DEX file with the "patch" methods and the "hooks" element is a list of target methods, where:
-
-* class-name : class name which contains target virtual method
-* method-name : target method name
-* method-sig : target method signature
-* hook-cls-name : "patch" code class name
-
 Click [here!]({% post_url /ART/2016-03-11-artdroid-doc %}) for an easy to follow step-by-step instructions for howto build and use ARTDroid.
