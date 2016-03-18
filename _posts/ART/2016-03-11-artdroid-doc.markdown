@@ -20,7 +20,7 @@ ARTDroid requires the following dependencies:
 
 Push the following files (paths are from repo root dir) to the device:
 
-{% highlight shell linenos %}
+{% highlight shell linenos=table %}
 adb push adbi/hijack/libs/armeabi/hijack /data/local/tmp
 adb push examples/classes.dex /data/local/tmp/target.dex
 adb push examples/arthook_demo/libs/armeabi/libarthook.so /data/local/tmp
@@ -31,13 +31,12 @@ adb root
 
 ## How to use
 
-Include the compile ARTDroid static library in your actually hooking code. In your code call the ARTDroid init function arthook_init_conf specifing as first argument the configuration file.
+Include the compiled ARTDroid static library in your actually hooking code. In your code call the ARTDroid init function *arthook_init_conf* specifing as its first argument the configuration file.
 Let's discuss how to use ARTDroid by means of the demo code included in the directory "example" of this repo.  
 
-Suppose you want to hook the method android.telephony.TelephonyManager's getDeviceId. First, write your own patch code using the Java language, the following snippet code is extracted from the example:
+Suppose you want to hook the method *android.telephony.TelephonyManager's getDeviceId*. First, write your own patch code using the Java language, the following snippet code is extracted from the example:
 
-{% highlight java linenos %}
-
+{% highlight java linenos=table %}
 public String getDeviceId() {
     Log.d(TAG, "FAKE GETDEVICEID ");
     Utils.saveStackTraces();
@@ -48,30 +47,30 @@ public String getDeviceId() {
 {% endhighlight %}
 
 
-Let's discuss the above code (we call it patch code). The variable named "key" is used to unique identify the target methods from ARTDroid internal data structures. It is composed by a concatenation of the following values: the Class' name, the method's name and finally its signature. ARTDroid exposes to Java the method callOriginalMethod which permits to call the original method, identified by "key", passing the specified "args". 
+Let's discuss the above code (we call it *patch code*). The "key" variable is used to unique identify the target methods in ARTDroid  data structures. It is composed by concatenation of the following values: the Class' name, the method's name and finally its signature. ARTDroid exposes to Java the method *callOriginalMethod*  which permits to call the original method (identified by "key", passing its "args") 
 The patch code could contain checks on the input arguments or code to manipulate the object "this" and of course, it could modify the return value or simply return a static value (forever true).
 
 Second, create a JSON formatted file containing the patch code info. In our example we use the following config file:
 
-{% highlight json linenos %}
+{% highlight json linenos=table %}
 
 {"config": {
     "debug": 1,
     "dex": "/data/local/tmp/target.dex",
     "hooks": [
     {
-        "class-name": "java/lang/reflect/Method",
-        "method-name": "invoke",
-        "method-sig": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;",
+        "class-name": "android/telephony/TelephonyManager",
+        "method-name": "getDeviceId",
+        "method-sig": "()Ljava/lang/String;",
         "hook-cls-name": "org/sid/artdroidexample/HookCls"
     }]
 }}
 {% endhighlight %}
 
 
-Finally, to initialize the ARTDroid framework include in your code a call the function arthook_init_conf, its first argument is the JSON configuration file. In our example we initialize the framework specifing the /data/local/tmp/test.json configuration file.
+Finally, to initialize the ARTDroid framework, include in your code a call to function *arthook_init_conf* specifing as its first argument the JSON configuration file. The following example shows how to init the framework specifing "/data/local/tmp/test.json" as the configuration file.
 
-{% highlight c linenos %}
+{% highlight c linenos=table %}
 
 configT_ptr configuration =  arthook_init_conf("/data/local/tmp/test.json");
 if( configuration == NULL){
@@ -81,16 +80,17 @@ if( configuration == NULL){
 {% endhighlight %}
 
 
-Now, all calls directed to the method getDeviceId will be redirected first to the patch code, then to the original method by the ARTDroid's core engine.
+All calls directed to the method getDeviceId will be redirected first to the patch code, then to the original method by the ARTDroid's core engine.
 
-The shared library produced by building the example code can be injected in the target process using the tool _hijack_. Put in mind to disable SELinux before hooking, otherwise it will prevent your stuff from working properly.
-Running the following command in a shell locally on the device, the hooking library is injected in the target process.
+The shared library produced by compiling the example code can be injected in the target process using the tool _hijack_. Put in mind to disable SELinux before to inject the library, otherwise it will prevent your stuff from working properly.
+To inject the compiled library in a target app, execute the following commands in a shell on the device:
 
-{% highlight shell linenos %}
+{% highlight shell linenos=table %}
 
 cd /data/local/tmp
 sh init.sh (run only once to set the environment)
 sh runhijack.sh -h
+
 {% endhighlight %}
 
 
@@ -99,6 +99,6 @@ Once the hooking library is loaded in the target app, debug/internal log message
 
 
 ## How to report bugs / suggestions
-To report bugs or consigli, you can use either the github issues system or the ARTDroid google group available at this address. Otherwise you can push an email to me at valerio.costamagna<at>di.unito.it. 
+To report bugs or suggestions, you can use either the github issues system or the ARTDroid google group available at this [address](https://groups.google.com/forum/#!forum/artdroid). Otherwise you can push an email to me at valerio.costamagna\at\di.unito.it. 
 
 
