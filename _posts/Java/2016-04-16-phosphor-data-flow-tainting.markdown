@@ -63,7 +63,8 @@ So far I did the following tests:
 # INT TAG mode
 
 First, I tested the JRE instrumented with int-tag tainting mode on both phosphortests.jar, test-app.jar and jenkins.
-***
+
+
 phosphortests results:
 
 {% highlight Java linenos %}
