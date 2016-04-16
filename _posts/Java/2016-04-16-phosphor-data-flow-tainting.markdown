@@ -91,7 +91,7 @@ phosphor plugin: # of tainted objects 1
 
 I don't know if it is a feature, but actually the plugin's code starts an endless loop.
 
-I also tested against jenkins using an empty sinks list and "java/io/ObjectInputStream.readObject()Ljava/io/Object;" as single source:
+I also tested against jenkins:
 
 {% highlight Java linenos %}
 $ java -jar Phosphor-0.0.2-SNAPSHOT.jar jenkins.war -taintSources taint-jenkins-sources jenkins
