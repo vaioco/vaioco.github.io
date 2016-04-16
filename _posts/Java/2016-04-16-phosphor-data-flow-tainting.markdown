@@ -232,7 +232,7 @@ Exception in thread "main" java.lang.IllegalAccessError: Argument carries taints
 # TODO
 
 
-- Actually, all tests against jre-inst-obj are failing
+- Actually, the jre-inst-obj (multiTaint mode) doesn't work
 
 - while instrumenting JRE with "java/io/InputStream.read()I" as taint-source, I see the following messages:
 
