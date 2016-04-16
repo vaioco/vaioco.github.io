@@ -62,7 +62,7 @@ So far I did the following tests:
 
 # INT TAG mode
 
-First, I tested the instrumented int-tag JRE (jre-inst) on both phosphortests.jar, test-app.jar  and jenkins.
+First, I tested the JRE instrumented with int-tag tainting mode on both phosphortests.jar, test-app.jar  and jenkins.
 
 phosphortests:
 
@@ -156,7 +156,7 @@ However, accessing to Jenkins web-dashboard a lots of error messagges are printe
 
 # USING MULTITAINT
 
-I'm going to show the results of JRE instrumented with multiTaint enabled. 
+I'm going to show the results of JRE instrumented with obj-tag tainting mode (multiTaint) enabled. 
 
 phosphortests:
 
