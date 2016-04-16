@@ -62,9 +62,9 @@ So far I did the following tests:
 
 # INT TAG mode
 
-First, I tested the JRE instrumented with int-tag tainting mode on both phosphortests.jar, test-app.jar  and jenkins.
-
-phosphortests:
+First, I tested the JRE instrumented with int-tag tainting mode on both phosphortests.jar, test-app.jar and jenkins.
+***
+phosphortests results:
 
 {% highlight Java linenos %}
 java -jar Phosphor-0.0.2-SNAPSHOT.jar -taintSources taint-sources -taintSinks taint-sinks phosphortests.jar phosphortests-inst-int
@@ -76,7 +76,7 @@ testFieldSensitivity3
 [...]
 {% endhighlight %}
 
-test-app:
+test-app results:
 
 {% highlight Java linenos %}
 java -jar Phosphor-0.0.2-SNAPSHOT.jar -taintSources taint-sources -taintSinks taint-sinks test-app.jar testapp-inst-int
@@ -92,8 +92,8 @@ phosphor plugin: # of tainted objects 1
 [...] 
 {% endhighlight %}
 
-(I see only 1 tainted object)
 
+(I see only 1 tainted object)
 I don't know if it is a feature, but actually the plugin's code starts an endless loop.
 
 I also tested against jenkins. During the instrumentation step, i got several exceptions like the following one:
