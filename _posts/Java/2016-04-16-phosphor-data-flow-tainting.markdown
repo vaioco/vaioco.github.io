@@ -157,13 +157,8 @@ However, accessing to Jenkins web-dashboard a lots of error messagges are printe
 # USING MULTITAINT
 
 I'm going to show the results of intrumented JRE with multiTaint enabled. 
-First, I created an instrumented JRE with multiTaint enable using the following command:
 
-{% highlight Java linenos %}
-java -jar Phosphor-0.0.2-SNAPSHOT.jar -taintSources taint-sources -taintSinks taint-sinks -multiTaint phosphortests.jar phosphortests-inst-multi
-{% endhighlight %}
-
-Then, i ran the phosphortests in multiTaint mode:
+phosphortests:
 
 {% highlight Java linenos %}
 $ jre-inst-obj/bin/java -Xbootclasspath/p:Phosphor-0.0.2-SNAPSHOT.jar -javaagent:Phosphor-0.0.2-SNAPSHOT.jar -cp phosphortests-inst-multi/phosphortests.jar -ea phosphor.test.DroidBenchTest
@@ -180,7 +175,7 @@ Caused by: java.lang.NoSuchMethodError: edu.columbia.cs.psl.phosphor.runtime.Tai
 
 .. but the infamous java.lang.NoSuchMethodError arise again ...
 
-Same story with test-app, but with different exception:
+Same story with test-app but with different exception:
 
 {% highlight Java linenos %}
 java -jar Phosphor-0.0.2-SNAPSHOT.jar -multiTaint -taintSources taint-sources -taintSinks taint-sinks test-app.jar testapp-inst-multi
