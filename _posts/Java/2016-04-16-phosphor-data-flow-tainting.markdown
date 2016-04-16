@@ -245,3 +245,26 @@ Source: com/sun/webkit/SimpleSharedBufferInputStream.read$$PHOSPHORTAGGED(Ledu/c
 
 I get no messages while instrumenting the JRE with "java/io/ObjectInputStream.readObject()Ljava/io/Object;" as single taint-source. It looks strange.
 
+(update: Ok, disass. rt.jar I see phosphor instrumentation code. So it seems ok even if no messages are printed out while phosphor is instrumenting )
+
+- tainting on methods which are calling each other, may arise IllegalAccessError ? The execution halts when I taint both "println" and "write"  :
+
+```
+Data flow tracking: enabled
+Control flow tracking: disabled
+Taints will be combined with logical-or.
+Starting analysis
+Analysis Completed: Beginning Instrumentation Phase
+Using taint sources file: /home/sid/PSU/deserialization/test-app/taint-source.txt
+Using taint sinks file: /home/sid/PSU/deserialization/test-app/taint-sink.txt
+Loaded 2 sinks and 1 sources
+Done
++ jre-inst/bin/java -Xbootclasspath/p:Phosphor-0.0.2-SNAPSHOT.jar -javaagent:Phosphor-0.0.2-SNAPSHOT.jar -cp testapp-inst-int/test-app.jar -ea com.test.Main
+haha
+plugin started
+
+Exception: java.lang.IllegalAccessError thrown from the UncaughtExceptionHandler in thread "main"
+
+Exception: java.lang.IllegalAccessError thrown from the UncaughtExceptionHandler in thread "Thread-0"
+```
+
