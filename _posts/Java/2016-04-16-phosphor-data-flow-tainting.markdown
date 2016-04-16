@@ -88,7 +88,8 @@ phosphor plugin: # of tainted objects 1
 {% endhighlight %}
 
 (I see only 1 tainted object)
-I don't know if it is a feature, but actually the plugin's code starts an endless loop. So, everything looks fine. 
+
+I don't know if it is a feature, but actually the plugin's code starts an endless loop.
 
 I also tested against jenkins using an empty sinks list and "java/io/ObjectInputStream.readObject()Ljava/io/Object;" as single source:
 
