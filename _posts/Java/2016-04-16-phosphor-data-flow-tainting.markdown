@@ -55,6 +55,11 @@ java -jar Phosphor-0.0.2-SNAPSHOT.jar -controlTrack -forceUnboxAcmpEq -withEnums
 {% endhighlight %}
 
 
+So far I did the following tests:
+
+1. JRE int-tag-instrumented on both test-app and jenkins
+2. JRE obj-tag-instrumented on both test-app and jenkins
+
 # INT TAG mode
 
 First, I tested the instrumented int-tag JRE (jre-inst) on both phosphortests.jar, test-app.jar  and jenkins.
