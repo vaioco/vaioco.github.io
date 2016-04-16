@@ -241,15 +241,6 @@ I get no messages while instrumenting the JRE with "java/io/ObjectInputStream.re
 - tainting on methods which are calling each other, may arise IllegalAccessError ? The execution halts when I taint both "println" and "write"  :
 
 ```
-Data flow tracking: enabled
-Control flow tracking: disabled
-Taints will be combined with logical-or.
-Starting analysis
-Analysis Completed: Beginning Instrumentation Phase
-Using taint sources file: /home/sid/PSU/deserialization/test-app/taint-source.txt
-Using taint sinks file: /home/sid/PSU/deserialization/test-app/taint-sink.txt
-Loaded 2 sinks and 1 sources
-Done
 + jre-inst/bin/java -Xbootclasspath/p:Phosphor-0.0.2-SNAPSHOT.jar -javaagent:Phosphor-0.0.2-SNAPSHOT.jar -cp testapp-inst-int/test-app.jar -ea com.test.Main
 haha
 plugin started
