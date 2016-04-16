@@ -109,7 +109,7 @@ java.util.zip.ZipException: duplicate entry: javax/jmdns/impl/tasks/state/Renewe
 	at edu.columbia.cs.psl.phosphor.Instrumenter.main(Instrumenter.java:380)
 {% endhighlight %}
 
-Besides the above expections, the instrumented version of jenkins is successfully created. Then i ran jenkins, and the following box shows the plugin messagges:
+Besides the above expections, the instrumented version of jenkins is successfully created. Then i ran jenkins, and the following box shows the plugin messages:
 
 {% highlight Java linenos %}
 sid@artdroid:~/PSU/deserialization/phosphor-mod/Phosphor/target$ ./jre-inst/bin/java -Xbootclasspath/a:Phosphor-0.0.2-SNAPSHOT.jar  -javaagent:Phosphor-0.0.2-SNAPSHOT.jar -jar jenkins/jenkins.war
@@ -153,7 +153,7 @@ phosphor plugin: # of tainted objects 50
 [...]
 {% endhighlight %}
 
-However, accessing to Jenkins web-dashboard a lots of error messagges are printed in the console, and also the dashboard is not fully accessible (stacktrace errors are printed in the web page)
+However, accessing to Jenkins web-dashboard a lots of error messages are printed in the console, and also the dashboard is not fully accessible (stacktrace errors are printed in the web page)
 
 # USING MULTITAINT
 
