@@ -120,7 +120,7 @@ phosphor plugin: # of tainted objects 1
 [...]
 {% endhighlight %}
 
-Then i ran the jenkins.py from JavaUnserializeExploits and the file in /tmp is successfully created. The following
+Then I ran the jenkins.py from JavaUnserializeExploits and the file in /tmp is successfully created. The following
 is the log printed by jenkins:
 
 {% highlight Java linenos %}
@@ -152,6 +152,7 @@ phosphor plugin: # of tainted objects 50
 [...]
 {% endhighlight %}
 
+However, accessing to Jenkins web-dashboard a lots of error messagges are printed in the console, and also the dashboard is not fully accessible (stacktrace errors are printed in the web page)
 
 # USING MULTITAINT
 
