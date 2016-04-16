@@ -245,7 +245,7 @@ Source: com/sun/webkit/SimpleSharedBufferInputStream.read$$PHOSPHORTAGGED(Ledu/c
 
 I get no messages while instrumenting the JRE with "java/io/ObjectInputStream.readObject()Ljava/io/Object;" as single taint-source. It looks strange.
 
-(update: Ok, disass. rt.jar I see phosphor instrumentation code. So it seems ok even if no messages are printed out while phosphor is instrumenting )
+(update: Ok, disass. rt.jar I see phosphor instrumentation code. So, even if no messages are printed out by phosphor, the instrument. code is properly added )
 
 - tainting on methods which are calling each other, may arise IllegalAccessError ? The execution halts when I taint both "println" and "write"  :
 
