@@ -96,22 +96,7 @@ phosphor plugin: # of tainted objects 1
 
 I don't know if it is a feature, but actually the plugin's code starts an endless loop.
 
-I also tested against jenkins:
-
-{% highlight Java linenos %}
-$ java -jar Phosphor-0.0.2-SNAPSHOT.jar jenkins.war -taintSources taint-jenkins-sources jenkins
-Data flow tracking: enabled
-Control flow tracking: disabled
-Taints will be combined with logical-or.
-Starting analysis
-Analysis Completed: Beginning Instrumentation Phase
-Using taint sources file: taint-sources
-Using taint sinks file: taint-sinks
-Loaded 0 sinks and 1 sources
-[...]
-{% endhighlight %}
-
-During the instrumentation step, i got several exceptions like the following one:
+I also tested against jenkins. During the instrumentation step, i got several exceptions like the following one:
 
 {% highlight Java linenos %}
 java.util.zip.ZipException: duplicate entry: javax/jmdns/impl/tasks/state/Renewer.class
