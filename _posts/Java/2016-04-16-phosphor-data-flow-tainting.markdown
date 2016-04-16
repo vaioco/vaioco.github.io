@@ -156,7 +156,7 @@ However, accessing to Jenkins web-dashboard a lots of error messagges are printe
 
 # USING MULTITAINT
 
-I'm going to show the results of intrumented JRE with multiTaint enabled. 
+I'm going to show the results of JRE instrumented with multiTaint enabled. 
 
 phosphortests:
 
